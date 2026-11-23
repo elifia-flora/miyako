@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mvg78kqeezb",
+  "title": {
+    "original": "测试 C",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "6/4",
+    "meterNote": null,
+    "bpm": 72,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [
+    "mysterious"
+  ],
+  "instrumentation": {
+    "abstract": "String Quartet"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [
+    {
+      "id": "coloristic-writing",
+      "root": "orchestration"
+    },
+    {
+      "id": "doubling",
+      "root": "orchestration"
+    },
+    {
+      "id": "ornamentation",
+      "root": "melodic"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

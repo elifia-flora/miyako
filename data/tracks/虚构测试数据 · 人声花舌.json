@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1o0136z",
+  "title": {
+    "original": "虚构测试数据 · 人声花舌",
+    "lang": "zh",
+    "subtitle": "女高音独唱",
+    "aliases": [
+      "花舌咏叹"
+    ]
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 68,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "虚构数据：女高音独唱，测试人声技法（舌尖颤音、假声）与装饰音。"
+  },
+  "period": "baroque",
+  "genre": "Vocal",
+  "album": null,
+  "credits": {
+    "composer": "虚构作曲",
+    "lyricist": null,
+    "arranger": "虚构编曲",
+    "performer": "虚构演奏组",
+    "mixingEngineer": null,
+    "releaseDate": "2026-01-01"
+  },
+  "links": {
+    "netease": null
+  },
+  "moods": [
+    "sad",
+    "tragic"
+  ],
+  "instrumentation": {
+    "abstract": "Soprano Solo"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "soprano"
+  ],
+  "derivedTags": [
+    {
+      "id": "soprano",
+      "parent": "voice",
+      "name": "Soprano"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "ornamentation",
+      "root": "melodic"
+    },
+    {
+      "id": "alveolar-trill",
+      "root": "tech-voice"
+    },
+    {
+      "id": "falsetto",
+      "root": "tech-voice"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [
+      {
+        "tick": 0,
+        "label": "咏叹"
+      },
+      {
+        "tick": 7680,
+        "label": "装饰"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "g harmonic minor",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 1920,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1920,
+      "durTicks": 1920,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "I",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

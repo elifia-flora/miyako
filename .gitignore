@@ -1,0 +1,91 @@
+node_modules/
+out/
+shots/
+data/atlas.db
+data/atlas.db-wal
+data/atlas.db-shm
+# 所有运行日志都在 logs/ 下（boot.log 等），不进仓库
+logs/
+boot.log
+# Chromium net log（网易云外链调试时偶尔落在根目录）
+debug.log
+# 冒烟用的独立 userData + 数据副本：和日常窗口完全隔离，跑测试不碰你的档案。
+# 带编号的副本（-2 / -3 …）由 smoke.mjs 轮转，**每种最多留 3 份**（2026-11-08 起）
+.smoke-profile/
+.smoke-profile-*/
+.smoke-data/
+.smoke-data-*/
+# 一次性校验脚本留下的同类目录（清理见 JUNK.md）
+.verify-profile/
+# 复现「浅色启动」时的一次性 profile / 数据副本（清理见 JUNK.md）
+.theme-probe/
+.theme-probe-data/
+smoke.log
+smoke-run.log
+# 冒烟进度落盘（npm run smoke:status 读它）：每次都不一样，别进仓库
+.smoke-run.json
+smoke-probe.log
+err.log
+# 本地临时工具环境（截图裁剪等），不进仓库
+.tools/
+
+# 音乐母带不进仓库：assets/ 里放着几十 MB 的 FLAC，git 存它会毁掉整个仓库的体积，而且大部分也没有版权
+*.flac
+*.wav
+*.m4a
+*.mp3
+*.ogg
+# Windows 快捷方式指向本机 electron.exe，换台机器就失效
+*.lnk
+# SQLite 的临时日志
+data/atlas.db-journal
+
+# ---- 公开发布前划的界（2026-11-23）----
+# 第三方素材与作者自己的曲库不进公开仓库：版权归各自权利人 / 属于个人数据。
+# 本地文件保留（应用照常能跑），只是不再被 git 跟踪。
+# 曲库：默认全忽略（新建的曲目不会误进公开仓库），
+# 下面逐个放行「要随安装包发布的那几条」；.archive/ 永远不带。
+data/tracks/*
+!data/tracks/%Composer} - %form} %Number of the form} in %Key}, %Opus Number} (mwgqq146-xezlas1v0k).json
+!data/tracks/%Composer} - %form} %Number of the form} in %Key}, %Opus Number}.json
+!data/tracks/%Movement Number} %Sub-Type} - %Tempo Term} (mwesfdk7-ranwff17we).json
+!data/tracks/The deepest nightmare of Sibyl.json
+!data/tracks/おとなの掟.json
+!data/tracks/未命名作品 (mwsx1sa7-4d9a7a14b8).json
+!data/tracks/未命名作品.json
+!data/tracks/测试 A 4536251.json
+!data/tracks/测试 B.json
+!data/tracks/测试 C.json
+!data/tracks/灰ト祈リ.json
+!data/tracks/神鹿谣.json
+!data/tracks/第1课作业参考答案 - 第5题.json
+!data/tracks/第一乐章 - 快板.json
+!data/tracks/第二乐章 - 柔板.json
+!data/tracks/第四乐章 - 最急板.json
+!data/tracks/虚构测试数据 · 二胡与竹笛.json
+!data/tracks/虚构测试数据 · 人声花舌.json
+!data/tracks/虚构测试数据 · 单簧管与钢琴.json
+!data/tracks/虚构测试数据 · 四重奏的模仿.json
+!data/tracks/虚构测试数据 · 定音鼓的滚奏.json
+!data/tracks/虚构测试数据 · 拨弦练习曲.json
+!data/tracks/虚构测试数据 · 晨雾中的长笛.json
+!data/tracks/虚构测试数据 · 木琴与低音大管.json
+!data/tracks/虚构测试数据 · 钢片琴与竖琴.json
+!data/tracks/虚构测试数据 · 铜管号角.json
+!data/tracks/重升重降测试.json
+data/covers/
+data/lyrics/
+data/playlists.json
+# 专辑封面是他人作品（用户 2026-11-23：没有版权，不传）
+assets/*封面*.jpg
+assets/*.lrc
+# 本机笔记与 WorkBuddy 的工作区记忆（跨会话上下文，不是项目内容）
+.workbuddy/
+# 给「新窗口」看的交接文档和清理清单：只在本地用
+HANDOFF.md
+JUNK.md
+# 系统 / 驱动在这个目录里留的缓存，和项目无关
+NVIDIA Corporation/
+
+# 打包产物（electron-builder）：安装包几十 MB，不进仓库；发布走 GitHub Release
+dist/

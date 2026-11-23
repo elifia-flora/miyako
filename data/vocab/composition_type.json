@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "dim": "composition_type",
+  "note": "体裁（composition_type）。回答「这是一部什么类型的作品」——交响曲、弦乐四重奏、艺术歌曲。与 genre（流派）分工：genre 只收写法与来源（古典 / 爵士 / 民谣 / 配乐），体裁收作品的形制；与 form（曲式）分工：体裁是「它是什么」，曲式是「它怎么长」。track.composition_type 存条目的 id，display 是中文显示。2026-11-04 从 genre.json 迁入：此前古典根下的交响曲 / 协奏曲 / 弦乐四重奏 / 室内乐 / 练习曲 / 号角曲其实是体裁，不是流派。赋格（fugue）两边都收：说「这是一首赋格」是体裁，说「用赋格曲式写成」是曲式（form 里另有 fugue-form）。它**不再**是作曲技法。",
+  "roots": [
+    {
+      "id": "instrumental",
+      "name": "Instrumental",
+      "display": "器乐",
+      "aliases": ["instrumental music", "器乐作品"],
+      "children": [
+        { "id": "symphony", "name": "Symphony", "display": "交响曲", "aliases": ["symphonic", "交响", "交响乐"] },
+        { "id": "concerto", "name": "Concerto", "display": "协奏曲", "aliases": ["concerto", "协奏"] },
+        { "id": "sonata", "name": "Sonata", "display": "奏鸣曲", "aliases": ["sonata", "奏鸣"] },
+        { "id": "string-quartet", "name": "String Quartet", "display": "弦乐四重奏", "aliases": ["string quartet", "四重奏", "弦四"] },
+        { "id": "chamber-music", "name": "Chamber Music", "display": "室内乐", "aliases": ["chamber", "室内乐"] },
+        { "id": "etude", "name": "Etude", "display": "练习曲", "aliases": ["study", "练习曲"] },
+        { "id": "fanfare", "name": "Fanfare", "display": "号角曲", "aliases": ["fanfare", "号角"] },
+        { "id": "prelude", "name": "Prelude", "display": "前奏曲", "aliases": ["prelude", "preludio", "前奏曲"] },
+        { "id": "fugue", "name": "Fugue", "display": "赋格", "aliases": ["fugue", "fuga", "赋格", "赋格曲"] },
+        { "id": "suite", "name": "Suite", "display": "组曲", "aliases": ["suite", "组曲"] },
+        { "id": "tone-poem", "name": "Tone Poem", "display": "交响诗", "aliases": ["tone poem", "symphonic poem", "交响诗", "音诗"] },
+        { "id": "rondo-piece", "name": "Rondo", "display": "回旋曲", "aliases": ["回旋曲"] },
+        { "id": "variazioni-piece", "name": "Variazioni", "display": "变奏曲", "aliases": ["变奏曲"] },
+        { "id": "toccata", "name": "Toccata", "display": "托卡塔", "aliases": ["托卡塔"] },
+        { "id": "fantasia", "name": "Fantasia", "display": "幻想曲", "aliases": ["fantasy", "幻想曲"] },
+        { "id": "passacaglia-piece", "name": "Passacaglia", "display": "帕萨卡利亚", "aliases": ["帕萨卡利亚"] },
+        { "id": "ciaccona", "name": "Ciaccona", "display": "恰空", "aliases": ["恰空"] },
+        { "id": "tema", "name": "Tema", "display": "主题", "aliases": ["theme", "主题"] },
+        { "id": "finale", "name": "Finale", "display": "终曲", "aliases": ["终曲"] },
+        { "id": "introduzione", "name": "Introduzione", "display": "引子", "aliases": ["introduction", "引子"] },
+        {
+          "id": "character-piece",
+          "name": "Character Piece",
+          "display": "特性小品",
+          "aliases": ["character piece", "小品", "特性曲"],
+          "children": [
+            { "id": "romanza", "name": "Romanza", "display": "浪漫曲", "aliases": ["romance", "浪漫曲"] },
+            { "id": "nocturne", "name": "Nocturne", "display": "夜曲", "aliases": ["夜曲"] },
+            { "id": "berceuse", "name": "Berceuse", "display": "摇篮曲", "aliases": ["摇篮曲"] },
+            { "id": "barcarolle", "name": "Barcarolle", "display": "船歌", "aliases": ["船歌"] },
+            { "id": "elegia", "name": "Elegia", "display": "悲歌", "aliases": ["elegy", "悲歌"] },
+            { "id": "capriccio", "name": "Capriccio", "display": "随想曲", "aliases": ["caprice", "随想曲"] },
+            { "id": "intermezzo", "name": "Intermezzo", "display": "间奏曲", "aliases": ["间奏曲"] }
+          ]
+        },
+        { "id": "march", "name": "March", "display": "进行曲", "aliases": ["march", "marcia", "进行曲"] },
+        {
+          "id": "dance",
+          "name": "Dance",
+          "display": "舞曲",
+          "aliases": ["dance", "舞曲"],
+          "children": [
+            { "id": "menuett", "name": "Menuetto", "display": "小步舞曲", "aliases": ["menuet", "minuet", "menuetto", "小步舞曲"] },
+            { "id": "trio", "name": "Trio", "display": "三声中部", "aliases": ["三声中部"] },
+            { "id": "scherzo", "name": "Scherzo", "display": "谐谑曲", "aliases": ["谐谑曲"] },
+            { "id": "sarabande", "name": "Sarabande", "display": "萨拉班德", "aliases": ["萨拉班德"] },
+            { "id": "gavotte", "name": "Gavotte", "display": "加沃特", "aliases": ["加沃特"] },
+            { "id": "bourree", "name": "Bourrée", "display": "布雷", "aliases": ["布雷"] },
+            { "id": "gigue", "name": "Gigue", "display": "吉格", "aliases": ["吉格"] },
+            { "id": "allemande", "name": "Allemande", "display": "阿勒曼德", "aliases": ["阿勒曼德"] },
+            { "id": "courante", "name": "Courante", "display": "库朗特", "aliases": ["库朗特"] },
+            { "id": "siciliano", "name": "Siciliano", "display": "西西里舞曲", "aliases": ["西西里舞曲"] },
+            { "id": "tarantella", "name": "Tarantella", "display": "塔兰泰拉", "aliases": ["塔兰泰拉"] },
+            { "id": "polonaise", "name": "Polonaise", "display": "波罗乃兹", "aliases": ["波罗乃兹"] },
+            { "id": "mazurka", "name": "Mazurka", "display": "玛祖卡", "aliases": ["玛祖卡"] },
+            { "id": "valse", "name": "Valse", "display": "圆舞曲", "aliases": ["waltz", "圆舞曲"] },
+            { "id": "passepied", "name": "Passepied", "display": "帕斯皮耶", "aliases": ["帕斯皮耶"] },
+            { "id": "rigaudon", "name": "Rigaudon", "display": "里戈东", "aliases": ["里戈东"] },
+            { "id": "musette", "name": "Musette", "display": "缪塞特", "aliases": ["缪塞特"] },
+            { "id": "forlane", "name": "Forlane", "display": "福尔拉纳", "aliases": ["福尔拉纳"] },
+            { "id": "loure", "name": "Loure", "display": "卢尔", "aliases": ["卢尔"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vocal-music",
+      "name": "Vocal",
+      "display": "声乐",
+      "aliases": ["vocal music", "声乐作品"],
+      "children": [
+        { "id": "aria-piece", "name": "Aria", "display": "咏叹调", "aliases": ["咏叹调"] },
+        { "id": "recitativo", "name": "Recitativo", "display": "宣叙调", "aliases": ["recitative", "宣叙调"] },
+        { "id": "cavatina", "name": "Cavatina", "display": "卡瓦蒂娜", "aliases": ["卡瓦蒂娜"] },
+        { "id": "chorale", "name": "Chorale", "display": "众赞歌", "aliases": ["众赞歌"] }
+      ]
+    }
+  ]
+}

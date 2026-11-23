@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1kti5fr",
+  "title": {
+    "original": "灰ト祈リ",
+    "lang": "ja",
+    "subtitle": "TV动画《尼尔：自动人形 Ver1.1a 第二季》片尾曲",
+    "aliases": [
+      "灰与祈愿",
+      "灰之祈祷",
+      "Hai to Inori"
+    ]
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 75,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "《尼尔：自动人形 Ver1.1a 第二季》片尾曲。冈部启一（MONACA）作曲/编曲，横尾太郎作词，GEMS COMPANY 演唱。配器以人声（含 whisper 声部）与弦乐组为主，另有故障音色（glitch）点缀；调式按旋律小调体系处理，情绪在神秘—未来感—阴冷—悲伤之间移动。"
+  },
+  "period": "contemporary",
+  "genre": null,
+  "album": null,
+  "credits": {
+    "composer": "岡部啓一 (MONACA)",
+    "lyricist": "ヨコオタロウ",
+    "performer": "GEMS COMPANY / 室屋光一郎 Strings",
+    "arranger": "岡部啓一 (MONACA)",
+    "releaseDate": "2024-07-06"
+  },
+  "links": {
+    "netease": "https://music.163.com/song?id=2603027640"
+  },
+  "moods": [
+    "mysterious",
+    "future",
+    "eerie",
+    "sad"
+  ],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "alto",
+    "soprano",
+    "viola",
+    "violin-1",
+    "violin-2",
+    "violoncello"
+  ],
+  "derivedTags": [],
+  "techniques": [
+    {
+      "id": "imitation",
+      "root": "counterpoint"
+    },
+    {
+      "id": "modal-mixture",
+      "root": "harmonic"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": "C:/Users/Administrator/WorkBuddy/dev/music-atlas/assets/GEMS COMPANY - 灰ト祈リ.flac",
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

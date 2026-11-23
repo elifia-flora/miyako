@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mwgma9q1-5efclkkqxn",
+  "parentId": null,
+  "title": {
+    "original": "未命名作品",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": null,
+    "meterNote": null,
+    "bpm": null,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "letter",
+  "name": "字母和弦",
+  "group": "harmony",
+  "needsContext": null,
+  "note": "绝对和弦名（Cmaj7 / G7♭9），不依赖调性。与级数是**两份数据**：本视图写泳道 `chord`，罗马数字视图写 `degree`，同一小节可以各写一条，互不覆盖。2026-11-04 之前两者共用 `chord`，导致这边显示出一串 I / IV / V7。",
+  "lanes": [
+    { "id": "chord", "label": "和弦", "kind": "text", "height": 30, "align": "left", "placeholder": "G7" },
+    { "id": "tension", "label": "延伸音", "kind": "text", "height": 30, "align": "center", "placeholder": "9, #11" },
+    { "id": "bass", "label": "低音", "kind": "note", "height": 30 },
+    { "id": "note", "label": "备注", "kind": "text", "height": 30, "align": "left" }
+  ]
+}

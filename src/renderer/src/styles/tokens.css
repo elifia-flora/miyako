@@ -1,0 +1,280 @@
+/* tokens.css — 设计变量都在这里，组件里不写死颜色 */
+
+/*
+ * 变音记号专用字体（`U+266D-266F` ♭ ♮ ♯、`U+1D12A-1D12B` 𝄪 𝄫）。
+ *
+ * 为什么需要它：这几个字符在中文字体（微软雅黑 / Noto Sans SC / 苹方）里是按**全角**
+ * 画的 —— 降号又宽又胖，和 `Cmaj7` 摆在一起像换了个字号；而"哪个字体先命中"取决于
+ * 用户的浏览器 / 系统默认字体，跨平台就更没谱。
+ *
+ * 这里是一个 5KB 的子集，源自 Steinberg 的 **Bravura**（SIL OFL 1.1）：
+ * 降号 0.23em 宽（中文全角约 1em），形状就是乐谱里那个。
+ * 依 OFL 的「保留字体名」条款，子集**必须改名**，所以家族名是 `Atlas Music`，
+ * 不是 `Bravura`。见 `assets/fonts/README.md`。
+ *
+ * `unicode-range` 限死这五个码位：其余字符照旧落到后面的字体栈，
+ * 这个只有记号的字体不会被拿去量别的字符。canvas 里画和弦也用同一个家族
+ * （`chordFont()` 读 body 的 font-family）。
+ */
+@font-face {
+  font-family: "Atlas Music";
+  src: url("../assets/fonts/AtlasMusic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+266D-266F, U+1D12A-1D12B;
+  font-display: swap;
+}
+
+:root {
+  /* "Atlas Music" 放最前面：它只认得上面那五个码位，别的字自动继续往下找 */
+  --font-mono: "Atlas Music", "JetBrains Mono", "Cascadia Mono", Consolas, "Sarasa Mono SC", "Microsoft YaHei Mono", monospace;
+  /*
+   * 无衬线（正文字族）。语言差异由下面的 `--font-text` 覆盖项决定。
+   *
+   * 它和「界面字体」那个开关**不是一回事**：开关只切 `[data-font]` 上的
+   * `body` 字族，`--font-text` 永远是这套无衬线 —— 模板字体两项就是按它设计的，
+   * 用户 2026-11-23 明确要求「不要依赖界面字体」。
+   */
+  --font-text: "Atlas Music", "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
+  --font-ui: var(--font-text);
+  --row-h: 28px;
+}
+
+/*
+ * 日语界面换一套字体。
+ *
+ * 中日共用汉字很多，但字形不同（「直」「骨」「次」一眼能看出）。微软雅黑只有简体字形，
+ * 拿它渲染日文会得到「中文字形的日文」，读起来别扭。这里把 Windows 的 Yu Gothic UI /
+ * macOS 的 Hiragino 提到最前；缺字体时按 Noto Sans JP → Segoe UI 往后退。
+ * 只在 `lang="ja"` 时生效，中文界面一个字都不变。
+ */
+:root[lang^="ja"] {
+  --font-text: "Atlas Music", "Yu Gothic UI", "Hiragino Sans", "Noto Sans JP", "Meiryo", "Segoe UI", system-ui, sans-serif;
+}
+
+/*
+ * 繁体界面（台湾 / 香港）换正体字形。
+ *
+ * 和日语是同一类问题：微软雅黑只有简体字形，「直」「骨」「次」「為」都会写成
+ * 简体那一套。Windows 的「微軟正黑體」/ macOS 的 PingFang TC 才是正体字形。
+ * 香港版字形（「裏」「着」）由字体自己按 lang 处理，这里只保证选中正确的字族。
+ */
+:root[lang^="zh-Hant"] {
+  --font-text: "Atlas Music", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --bg: #141413;
+  --surface: #1c1c1a;
+  --surface-2: #232320;
+  --text: #e8e8e4;
+  --text-dim: #8a8a84;
+  --text-faint: #5d5d58;
+  --line: #2e2e2b;
+  --line-strong: #3a3a36;
+  /* 高亮主色 = Vue 绿（#42b883）。深色底上直接用品牌色，对比度够；
+     --accent-rgb 供 canvas 画半透明填充（canvas 读不了 color-mix） */
+  --accent: #42b883;
+  --accent-rgb: 66, 184, 131;
+  --accent-2: #6fd3a3;
+  --sel-bg: #17271f;
+  --warn: #e0a45e;
+  /* 选中块的底色 + 铺在上面的字色（canvas 直接 fill）。
+     深色主题用同色系的暗绿：用户的反馈是 #C3E0D3 那种浅薄荷在深底上「很显眼但太亮」，
+     看久了刺眼。框（--accent 1.5px 圆角）负责让它一眼被认出来，底色不用那么跳。 */
+  --sel-fill: #26463a;
+  --sel-ink: #eef7f2;
+  /* 危险色（删除 / 清空 / 覆盖已对齐的原点）。实心红底配白字约 4.6:1，
+     浅色主题再压暗一档，否则白底上的白字只有 3:1 出头 */
+  --danger: #c9473f;
+  --danger-hi: #d95b52;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  /* 「略微凸起」用的两件套：右缘一道极淡高光 + 一层贴着边的投影 */
+  --raise-hi: rgba(255, 255, 255, 0.055);
+  --raise-shadow: 3px 0 10px -6px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="light"] {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f1;
+  --text: #1c1c1a;
+  --text-dim: #6b6b66;
+  --text-faint: #9a9a94;
+  --line: #e4e4e0;
+  --line-strong: #d2d2cc;
+  /* 同一个 Vue 绿压暗一档：白底上 #42b883 做文字只有 2.4:1，读不清 */
+  --accent: #2f9e6b;
+  --accent-rgb: 47, 158, 107;
+  --accent-2: #47a97c;
+  --sel-bg: #e8f6ef;
+  /* 浅色主题就是用户指定的那支绿；上面铺深墨字 */
+  --sel-fill: #c3e0d3;
+  --sel-ink: #17211c;
+  --warn: #a16207;
+  --danger: #b7362c;
+  --danger-hi: #99291f;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  /* 浅色下高光得是纯白，否则看不到"掀起来一条边"的感觉 */
+  --raise-hi: rgba(255, 255, 255, 0.95);
+  --raise-shadow: 3px 0 8px -5px rgba(0, 0, 0, 0.14);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  /* 界面默认无衬线：等宽在长句与中文里太紧，只留给数字与网格 */
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* 设置里可以切回等宽。网格里的和弦标记跟着这个设置走（等宽太占宽，长符号最容易溢出格子），
+   只有小节号仍固定等宽 —— 数字位数对齐比字形紧凑更重要 */
+:root[data-font="mono"] body { font-family: var(--font-mono); }
+
+/* 数字一律等宽对齐，表格不抖 */
+.num { font-variant-numeric: tabular-nums; }
+
+/*
+ * 焦点环：浏览器默认那个「缠绕」的方框在深色界面上很扎眼（用户报的就是它）。
+ * 统一成贴着圆角的细描边；播放条例外 —— 空格是全局快捷键，按一下就会让它
+ * 进入 :focus-visible，那个框纯属噪音。
+ */
+button:focus { outline: none; }
+button:focus-visible {
+  outline: 1.5px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset: 1px;
+}
+.transport button:focus,
+.transport button:focus-visible { outline: none; }
+
+/*
+ * **鼠标点过的按钮不画焦点环**（2026-11-08）。
+ *
+ * 起因：点一下曲目列表的展开箭头，再按空格播放 —— 箭头旁边冒出一个绿色方框。
+ * 根因不是箭头特殊，而是**空格是全局播放键**：鼠标点完按钮，焦点留在上面，
+ * 随手按一下空格，Chromium 就把这个元素提升成 `:focus-visible`（协议规定：
+ * 鼠标焦点 + 任意按键 = 键盘焦点），于是那个环就出现了。
+ * 用户根本不是在「键盘导航」，所以这个环在这个应用里几乎永远是噪音。
+ *
+ * 做法是记「上一次输入是什么」。只有 **Tab** 才算键盘导航并给环：
+ *   pointerdown → data-input="pointer"（此后一律不画）
+ *   Tab         → data-input="keyboard"（此后照常画）
+ * 别的键（空格、字母）不改这个值 —— 它们是快捷键，不是导航。
+ * 这样鼠标用户可以安心点、安心按空格；键盘用户 Tab 过去仍然看得见焦点在哪。
+ */
+:root[data-input="pointer"] button:focus-visible { outline: none; }
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 4px 7px;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent);
+}
+
+/*
+ * 滚动条：留槽位、藏视觉，真正的条由 `slimscroll.ts` 自绘在 fixed 层上。
+ *
+ * 为什么留 10px：隐藏原生条会让内容区变宽 10px，整个布局跟着挪一下 —— 不值得。
+ * 为什么藏视觉：Chromium 不给滚动条伪元素做 transition，`width` 一改就是硬跳，
+ * 做不出「细条平滑变粗」；自绘之后 200ms 的过渡才成立。
+ * 原生条仍然能点能拖（只是看不见），等于多一层热区，不冲突。
+ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: transparent; border-radius: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+/* 横竖滚动条交汇的那个小方块：不设的话用它自己的默认白底，
+   深色模式里就是右下角一个突兀的白色方点 */
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ---------- 自绘细滚动条（见 slimscroll.ts 顶部的说明） ---------- */
+#slim-layer { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+
+.slim-track { position: fixed; pointer-events: auto; }
+/* 热区 20px = 常态细条 4px 的 5 倍（用户 2026-11-23 定的档） */
+.slim-track-v { width: 20px; }
+.slim-track-h { height: 20px; }
+
+.slim-thumb {
+  position: absolute;
+  background: var(--line-strong);
+  border-radius: 3px;
+  /* 常态 4px → hover 20px（= 5 倍），这就是用户要的「识别范围变大」 */
+  transition: width 200ms ease, height 200ms ease, background 200ms ease;
+}
+.slim-track-v .slim-thumb { right: 0; top: 0; width: 4px; }
+.slim-track-h .slim-thumb { bottom: 0; left: 0; height: 4px; }
+/* 悬停与拖动中都用同一档宽度：拖的时候鼠标容易滑出热区，不能让条缩回去 */
+.slim-track-v:hover .slim-thumb,
+.slim-track-v .slim-thumb.on { width: 20px; border-radius: 10px; background: var(--text-faint); }
+.slim-track-h:hover .slim-thumb,
+.slim-track-h .slim-thumb.on { height: 20px; border-radius: 10px; background: var(--text-faint); }
+
+.dim { color: var(--text-dim); }
+.faint { color: var(--text-faint); }
+.uncertain { color: var(--text-dim); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text-dim);
+  background: var(--surface-2);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.chip:hover { border-color: var(--line-strong); color: var(--text); }
+
+/* 所有补全列表共用：一行本色一行灰，避免长列表看串行。
+   新增补全列表请把类名加进 :is(...)，不要在组件里另写 li 背景。 */
+:is(.key-sug, .sug, .field-sug) li:nth-child(even) {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+:is(.key-sug, .sug, .field-sug) li.on { background: var(--sel-bg); }
+
+.tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface-2);
+  font-size: 11px;
+  cursor: default;
+}
+.tag b { font-weight: 500; }
+.tag.dimmed { opacity: 0.75; }

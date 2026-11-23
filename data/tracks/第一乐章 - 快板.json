@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mwescfaq-10hdatg1u6",
+  "parentId": "tr-mweqiqjq-1itdx4iq9t",
+  "title": {
+    "original": "第一乐章 - 快板",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": null,
+    "meterNote": null,
+    "bpm": null,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null,
+    "formNumber": null,
+    "opusNumber": null,
+    "subType": null,
+    "tempoTerm": "快板"
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

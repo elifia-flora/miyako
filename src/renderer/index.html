@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <title>music-atlas</title>
+    <!--
+      CSP 白名单：自定义协议必须逐个列进来，漏一个就是「功能不报错、图出不来」。
+      ma-art:（封面）之前漏了，img-src 只放行 ma-audio:，
+      结果所有 ma-art:// 的图都被浏览器静默拦掉，只在控制台留一行 Refused to load。
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ma-art:; media-src 'self' ma-audio: file: blob:; connect-src 'self' ma-audio: ma-art:; script-src 'self'" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mwesfdk7-ranwff17we",
+  "parentId": "tr-mweqiqjq-1itdx4iq9t",
+  "title": {
+    "original": "%Movement Number} %Sub-Type} - %Tempo Term}",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 120,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null,
+    "formNumber": null,
+    "opusNumber": null,
+    "subType": "menuett",
+    "tempoTerm": "小快板"
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": "compound-ternary",
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

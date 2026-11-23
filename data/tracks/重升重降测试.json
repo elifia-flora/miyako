@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mvotl13v-6c368kzc72",
+  "title": {
+    "original": "重升重降测试",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 120,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": [
+      {
+        "tick": 1920,
+        "keyName": "C Sharp Major",
+        "confidence": "confirmed",
+        "note": null
+      },
+      {
+        "tick": 24960,
+        "keyName": "d-flat major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 1920,
+      "durTicks": 1920,
+      "text": "III7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 9600,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 24960,
+      "durTicks": 1920,
+      "text": "V65/V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 26880,
+      "durTicks": 1920,
+      "text": "V7sus4",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 28800,
+      "durTicks": 1920,
+      "text": "♭II",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 30720,
+      "durTicks": 1920,
+      "text": "ii",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 32640,
+      "durTicks": 1920,
+      "text": "N6",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

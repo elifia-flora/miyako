@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1m6bt8r",
+  "title": {
+    "original": "虚构测试数据 · 四重奏的模仿",
+    "lang": "zh",
+    "subtitle": "弦乐四重奏",
+    "aliases": []
+  },
+  "basic": {
+    "meter": "3/4",
+    "meterNote": null,
+    "bpm": 84,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "虚构数据：四声部依次模仿，测试可转位对位与弱音器、靠指板。"
+  },
+  "period": "romantic",
+  "genre": "Classical",
+  "compositionType": "string-quartet",
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "虚构作曲",
+    "lyricist": null,
+    "arranger": "虚构编曲",
+    "performer": "虚构演奏组",
+    "mixingEngineer": null,
+    "releaseDate": "2026-01-01"
+  },
+  "links": {
+    "netease": null
+  },
+  "moods": [
+    "tragic",
+    "sad"
+  ],
+  "instrumentation": {
+    "abstract": "String Quartet"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "viola",
+    "violin-1",
+    "violin-2",
+    "violoncello"
+  ],
+  "derivedTags": [
+    {
+      "id": "viola",
+      "parent": "strings",
+      "name": "Viola"
+    },
+    {
+      "id": "violin-1",
+      "parent": "strings",
+      "name": "Violins 1"
+    },
+    {
+      "id": "violin-2",
+      "parent": "strings",
+      "name": "Violins 2"
+    },
+    {
+      "id": "violoncello",
+      "parent": "strings",
+      "name": "Violoncello"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "imitation",
+      "root": "counterpoint"
+    },
+    {
+      "id": "con-sordino",
+      "root": "tech-strings"
+    },
+    {
+      "id": "sul-tasto",
+      "root": "tech-strings"
+    },
+    {
+      "id": "vibrato",
+      "root": "tech-strings"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [
+      {
+        "tick": 0,
+        "label": "主题"
+      },
+      {
+        "tick": 5760,
+        "label": "模仿"
+      },
+      {
+        "tick": 11520,
+        "label": "再现"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "e-flat major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 1440,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1440,
+      "durTicks": 1440,
+      "text": "vi",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 1440,
+      "text": "IV",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 4320,
+      "durTicks": 1440,
+      "text": "V",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

@@ -1,0 +1,84 @@
+# 打包配置（electron-builder）。
+#
+# 只装**运行**要的东西：out/（编译产物）、package.json、assets/（图标 / 收款码 / 笔记）。
+# 词表与泳道方案作为「种子」放进 resources/data，第一次启动复制到 userData/data
+# （见 src/main/db/open.ts 的 resolveDataDir）—— 安装目录在 Program Files 下是只读的。
+appId: app.miyako
+productName: miyako
+copyright: Copyright © 2026 elifia-flora
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - out/**/*
+  - package.json
+  - assets/**/*
+  # 显式写了 files 之后，electron-builder 会把**整个** node_modules 塞进 asar
+  # （连 electron-builder 自己都在里面）—— 安装包因此有 89MB 的 asar。
+  # 这里反过来：先全排除，再只放回运行期真正要用的几个。
+  - '!node_modules/**/*'
+  - 'node_modules/better-sqlite3/**/*'
+  - 'node_modules/node-addon-api/**/*'
+  - 'node_modules/vue/**/*'
+  - '!**/*.map'
+  # assets/ 里混着本机的母带与歌词（gitignore 只挡 git，挡不住打包）：一律不带。
+  - '!assets/**/*.{flac,wav,mp3,m4a,ogg,lrc}'
+  # 专辑封面是他人作品（没有版权），仓库里不带，打包也不带
+  - '!assets/*封面*.jpg'
+  # better-sqlite3 的预编译包给了七个平台，只留本机这个；build/ 是编译中间物。
+  - '!node_modules/better-sqlite3/prebuilds/darwin-*'
+  - '!node_modules/better-sqlite3/prebuilds/linux*'
+  - '!node_modules/better-sqlite3/build/**'
+
+extraResources:
+  - from: data/vocab
+    to: data/vocab
+  - from: data/views
+    to: data/views
+  # 曲库：随包发布的是仓库里那 27 条（data/tracks/*.json），
+  # **.archive/ 里的归档条目一律不带**（那是被删掉的东西）。
+  - from: data/tracks
+    to: data/tracks
+    filter:
+      - '**/*.json'
+      - '!.archive/**'
+
+asar: true
+asarUnpack:
+  - '**/*.node'
+# better-sqlite3 已经在 postinstall 里 electron-rebuild 过（Electron ABI），
+# 这里不要再联网重建一遍：构建机常常连不上 GitHub 的预编译包。
+npmRebuild: false
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: assets/app.ico
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: miyako
+  artifactName: ${productName}-${version}-setup.${ext}
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+# macOS 只能在 macOS（或 CI 的 macOS runner）上打：dmg 依赖 hdiutil、签名依赖 codesign。
+mac:
+  target: [dmg, zip]
+  category: public.app-category.music
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+linux:
+  target: [AppImage]
+  category: Audio
+  artifactName: ${productName}-${version}-${arch}.${ext}

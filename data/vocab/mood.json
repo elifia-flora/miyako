@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "dim": "mood",
+  "note": "情绪（mood）。id 就是档案 extra.moods 里存的值（小写英文枚举），display 是界面上的中文，aliases 进搜索与补全。改 id 会让已登记的曲目对不上，只想换中文说法就改 display。这里刻意平铺：每个条目都是能直接标在曲目上的情绪，没有分组层（分组根不是情绪，标上去没有意义）。",
+  "roots": [
+    { "id": "nostalgic", "name": "nostalgic", "display": "怀旧", "aliases": ["nostalgia", "怀旧感", "思乡"] },
+    { "id": "intimate", "name": "intimate", "display": "亲密", "aliases": ["intimacy", "亲昵", "私密"] },
+    { "id": "warm", "name": "warm", "display": "温暖", "aliases": ["warmth", "温情", "和煦"] },
+    { "id": "calm", "name": "calm", "display": "平静", "aliases": ["peaceful", "宁静", "安静"] },
+    { "id": "sad", "name": "sad", "display": "悲伤", "aliases": ["sorrow", "伤感", "哀伤"] },
+    { "id": "melancholy", "name": "melancholy", "display": "忧郁", "aliases": ["melancholic", "阴郁", "感伤"] },
+    { "id": "joyful", "name": "joyful", "display": "欢快", "aliases": ["cheerful", "愉快", "明快"] },
+    { "id": "humorous", "name": "humorous", "display": "诙谐", "aliases": ["playful", "幽默", "俏皮"] },
+    { "id": "tender", "name": "tender", "display": "抒情", "aliases": ["lyrical", "柔美", "温柔"] },
+    { "id": "dreamy", "name": "dreamy", "display": "梦幻", "aliases": ["dreamlike", "空灵", "朦胧"] },
+    { "id": "solemn", "name": "solemn", "display": "庄重", "aliases": ["庄严", "肃穆", "凝重"] },
+    { "id": "tense", "name": "tense", "display": "紧张", "aliases": ["tension", "紧绷", "压迫"] },
+    { "id": "nervous", "name": "nervous", "display": "不安", "aliases": ["restless", "焦躁", "忐忑"] },
+    { "id": "eerie", "name": "eerie", "display": "阴冷", "aliases": ["creepy", "诡异", "阴森"] },
+    { "id": "mysterious", "name": "mysterious", "display": "神秘", "aliases": ["mystery", "神秘感", "悬疑", "神秘", "神秘的"] },
+    { "id": "aggressive", "name": "aggressive", "display": "激烈", "aliases": ["fierce", "狂躁", "躁动"] },
+    { "id": "epic", "name": "epic", "display": "宏大", "aliases": ["grandiose", "壮阔", "气势"] },
+    { "id": "tragic", "name": "tragic", "display": "悲壮", "aliases": ["tragedy", "悲怆", "悲剧"] },
+    { "id": "heroic", "name": "heroic", "display": "英雄气概", "aliases": ["英雄", "壮烈", "昂扬"] },
+    { "id": "future", "name": "future", "display": "未来感", "aliases": ["futuristic", "未来", "科幻"] }
+  ]
+}

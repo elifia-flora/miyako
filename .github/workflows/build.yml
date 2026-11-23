@@ -1,0 +1,84 @@
+# 在 GitHub 的机器上打三平台安装包 —— 包括本机做不出来的 macOS。
+#
+# 为什么需要它：dmg 依赖 macOS 的 hdiutil、苹果签名的 codesign，Windows / Linux
+# 都做不了（交叉编译没有被支持）。这里用 macOS runner 打，产出 zip / dmg 作为
+# workflow artifact 下载即可，不签名（首次打开要右键 → 打开）。
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: '把产物直接上传到这个 Release（留空则只放 Actions artifact）'
+        required: false
+        default: ''
+        type: string
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+            artifact: miyako-windows
+          - os: macos-latest
+            script: dist:mac
+            artifact: miyako-macos
+          - os: ubuntu-latest
+            script: dist:linux
+            artifact: miyako-linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖（postinstall 会把 better-sqlite3 重建成 Electron ABI）
+        run: npm ci
+
+      - name: 纯函数单测
+        run: npm test
+
+      - name: 打包
+        env:
+          # 没有证书：跳过签名，打出来的包首次打开需要手动放行
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run ${{ matrix.script }}
+
+      # 产物直接从 GitHub 传上去：本地再下载一遍、再上传，是最慢的一条路
+      # （本机到 GitHub 只有 ~60KB/s，268MB 的 mac 产物要一个多小时）。
+      - name: 上传到 Release（填了 release_tag 才做）
+        if: ${{ inputs.release_tag != '' }}
+        shell: bash   # Windows runner 默认是 pwsh，这里要用 bash 的数组语法
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          case "${{ matrix.os }}" in
+            windows-latest) FILES=(dist/*.exe) ;;
+            macos-latest)   FILES=(dist/*.dmg dist/*.zip) ;;
+            ubuntu-latest)  FILES=(dist/*.AppImage) ;;
+          esac
+          gh release upload "${{ inputs.release_tag }}" "${FILES[@]}" --clobber
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.AppImage
+          if-no-files-found: error

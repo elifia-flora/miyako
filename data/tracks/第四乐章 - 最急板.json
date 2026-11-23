@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mwesgqrz-c0hhq1185x",
+  "parentId": "tr-mweqiqjq-1itdx4iq9t",
+  "title": {
+    "original": "第四乐章 - 最急板",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 120,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": []
+  },
+  "events": [],
+  "extra": {}
+}

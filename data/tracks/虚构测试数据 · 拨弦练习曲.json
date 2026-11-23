@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-7e585",
+  "title": {
+    "original": "虚构测试数据 · 拨弦练习曲",
+    "lang": "zh",
+    "subtitle": "四把弦乐的拨弦练习",
+    "aliases": [
+      "拨弦练习"
+    ]
+  },
+  "basic": {
+    "meter": "2/4",
+    "meterNote": null,
+    "bpm": 112,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "虚构数据：全曲只用拨弦与巴托克拨弦，测试演奏技法标签与逆行。"
+  },
+  "period": "contemporary",
+  "genre": "Classical",
+  "compositionType": "etude",
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "虚构作曲",
+    "lyricist": null,
+    "arranger": "虚构编曲",
+    "performer": "虚构演奏组",
+    "mixingEngineer": null,
+    "releaseDate": "2026-01-01"
+  },
+  "links": {
+    "netease": null
+  },
+  "moods": [
+    "nervous",
+    "warm"
+  ],
+  "instrumentation": {
+    "abstract": "String Quartet (pizzicato)"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "contrabass",
+    "viola",
+    "violin",
+    "violoncello"
+  ],
+  "derivedTags": [
+    {
+      "id": "contrabass",
+      "parent": "strings",
+      "name": "Contrabass"
+    },
+    {
+      "id": "viola",
+      "parent": "strings",
+      "name": "Viola"
+    },
+    {
+      "id": "violin",
+      "parent": "strings",
+      "name": "Violin"
+    },
+    {
+      "id": "violoncello",
+      "parent": "strings",
+      "name": "Violoncello"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "retrograde",
+      "root": "melodic"
+    },
+    {
+      "id": "pizzicato",
+      "root": "tech-strings"
+    },
+    {
+      "id": "snap-pizzicato",
+      "root": "tech-strings"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [
+      {
+        "tick": 0,
+        "label": "A"
+      },
+      {
+        "tick": 7680,
+        "label": "A'"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "a harmonic minor",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 960,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 960,
+      "durTicks": 960,
+      "text": "iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1920,
+      "durTicks": 960,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 960,
+      "text": "i",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

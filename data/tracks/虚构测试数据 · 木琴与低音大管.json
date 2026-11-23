@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-7g1rfp",
+  "title": {
+    "original": "虚构测试数据 · 木琴与低音大管",
+    "lang": "zh",
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "6/8",
+    "meterNote": null,
+    "bpm": 120,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "虚构数据：木琴与低音大管的音色对置，测试断奏与旋律倒影。"
+  },
+  "period": "contemporary",
+  "genre": "Classical",
+  "compositionType": "chamber-music",
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "虚构作曲",
+    "lyricist": null,
+    "arranger": "虚构编曲",
+    "performer": "虚构演奏组",
+    "mixingEngineer": null,
+    "releaseDate": "2026-01-01"
+  },
+  "links": {
+    "netease": null
+  },
+  "moods": [
+    "future",
+    "nervous"
+  ],
+  "instrumentation": {
+    "abstract": "Xylophone + Contrabassoon"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "contrabassoon",
+    "xylophone"
+  ],
+  "derivedTags": [
+    {
+      "id": "contrabassoon",
+      "parent": "woodwind",
+      "name": "Contrabassoon"
+    },
+    {
+      "id": "xylophone",
+      "parent": "mallet",
+      "name": "Xylophone"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "melodic-inversion",
+      "root": "melodic"
+    },
+    {
+      "id": "dead-stroke",
+      "root": "tech-percussion"
+    },
+    {
+      "id": "staccato",
+      "root": "general"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [
+      {
+        "tick": 0,
+        "label": "A"
+      },
+      {
+        "tick": 11520,
+        "label": "B"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "g major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 1440,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1440,
+      "durTicks": 1440,
+      "text": "vi",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 1440,
+      "text": "ii",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 4320,
+      "durTicks": 1440,
+      "text": "V",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

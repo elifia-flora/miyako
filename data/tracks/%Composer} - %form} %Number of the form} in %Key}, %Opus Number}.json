@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mweqiqjq-1itdx4iq9t",
+  "parentId": null,
+  "title": {
+    "original": "%Composer} - %form} %Number of the form} in %Key}, %Opus Number}",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": null,
+    "meterNote": null,
+    "bpm": null,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null,
+    "formNumber": "No.1",
+    "opusNumber": "Op.2 No.1",
+    "subType": null,
+    "tempoTerm": null
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": "Piano Sonata",
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "Beethoven"
+  },
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": [
+      {
+        "tick": 1920,
+        "keyName": "F Minor",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [],
+  "extra": {}
+}

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mwdzpzjf-9hwfs9180f",
+  "title": {
+    "original": "第1课作业参考答案 - 第5题",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 72,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": null,
+  "links": null,
+  "moods": [],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": "H:\\Music Production\\Cubase Projects\\music-teaching\\Mixdown\\第1课作业参考答案 - 第5题.wav",
+    "sections": [],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "B major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 1920,
+      "durTicks": 960,
+      "text": "IVadd9",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 960,
+      "text": "Vadd9",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "viadd9",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 5760,
+      "durTicks": 960,
+      "text": "IVadd9",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 6720,
+      "durTicks": 960,
+      "text": "Vadd9",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 7680,
+      "durTicks": 1920,
+      "text": "Imaj9",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

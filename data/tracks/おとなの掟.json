@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1v3hqr8",
+  "title": {
+    "original": "おとなの掟",
+    "lang": "ja",
+    "subtitle": "日剧《四重奏》主题曲",
+    "aliases": [
+      "成人法则",
+      "Otona no Okite",
+      "Doughnuts Hole"
+    ]
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": "拍号与速度尚未标注（原始资料留空），带音频后再补",
+    "bpm": null,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "Doughnuts Hole（椎名林檎、斉藤和義等组成的限定组合）为日剧《四重奏》写的主题曲。编制是标准弦乐四重奏（两把小提琴、中提琴、大提琴）加人声；调性按升 c 旋律小调体系记谱，以大调视角看约等于 E。资料里标注的动态是「有转调」，所以网格默认按单速对齐，实际速度变化要在 tempo marker 里逐段标。"
+  },
+  "period": "contemporary",
+  "genre": null,
+  "album": null,
+  "credits": {
+    "composer": null,
+    "lyricist": null,
+    "performer": "Doughnuts Hole",
+    "releaseDate": "2017-02-07"
+  },
+  "links": {
+    "netease": "https://music.163.com/song?id=458725738"
+  },
+  "moods": [
+    "nostalgic",
+    "intimate"
+  ],
+  "instrumentation": null,
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "viola",
+    "violin-1",
+    "violin-2",
+    "violoncello"
+  ],
+  "derivedTags": [
+    {
+      "id": "viola",
+      "parent": "strings",
+      "name": "Viola"
+    },
+    {
+      "id": "violin-1",
+      "parent": "strings",
+      "name": "Violins 1"
+    },
+    {
+      "id": "violin-2",
+      "parent": "strings",
+      "name": "Violins 2"
+    },
+    {
+      "id": "violoncello",
+      "parent": "strings",
+      "name": "Violoncello"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "modulation",
+      "root": "harmonic"
+    },
+    {
+      "id": "modulation",
+      "root": "melodic"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "c-sharp melodic minor",
+        "confidence": "uncertain",
+        "note": "原资料只写「c♯ 旋律小调体系 / 大调视角 E」"
+      }
+    ]
+  },
+  "events": [],
+  "extra": {}
+}

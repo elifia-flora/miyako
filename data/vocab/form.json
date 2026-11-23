@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "dim": "form",
+  "note": "曲式（form）。回答「整首曲子按什么骨架长出来」——奏鸣曲式、回旋曲式、单三部曲式。与 composition_type（体裁）分工：体裁是「它是什么」（交响曲），曲式是「它怎么长」（奏鸣曲式）；一首交响曲的第一乐章可以是奏鸣曲式，所以两者不能合并。track.form 存条目的 id。这是**整曲一条**的抽象结论，不做逐段曲式标注（分段属于时间轴 · 段落）。",
+  "roots": [
+    {
+      "id": "simple",
+      "name": "Simple",
+      "display": "简单曲式",
+      "aliases": ["simple form"],
+      "children": [
+        { "id": "one-part", "name": "One-part", "display": "一部曲式", "aliases": ["one part", "乐段", "一部"] },
+        { "id": "binary", "name": "Binary", "display": "单二部曲式", "aliases": ["binary form", "二部曲式", "单二部", "AB"] },
+        { "id": "ternary", "name": "Ternary", "display": "单三部曲式", "aliases": ["ternary form", "三部曲式", "单三部", "ABA"] }
+      ]
+    },
+    {
+      "id": "compound",
+      "name": "Compound",
+      "display": "复合曲式",
+      "aliases": ["compound form"],
+      "children": [
+        { "id": "compound-binary", "name": "Compound Binary", "display": "复二部曲式", "aliases": ["compound binary", "复二部"] },
+        { "id": "compound-ternary", "name": "Compound Ternary", "display": "复三部曲式", "aliases": ["compound ternary", "复三部"] },
+        { "id": "rondo", "name": "Rondo", "display": "回旋曲式", "aliases": ["rondo", "回旋", "ABACA"] },
+        { "id": "sonata-rondo", "name": "Sonata Rondo", "display": "奏鸣回旋曲式", "aliases": ["sonata rondo", "奏鸣回旋"] }
+      ]
+    },
+    {
+      "id": "developmental",
+      "name": "Developmental",
+      "display": "展开性曲式",
+      "aliases": [],
+      "children": [
+        { "id": "sonata-form", "name": "Sonata Form", "display": "奏鸣曲式", "aliases": ["sonata form", "奏鸣曲式", "奏鸣"] },
+        { "id": "variations", "name": "Theme and Variations", "display": "变奏曲式", "aliases": ["variations", "变奏", "变奏曲式"] },
+        { "id": "fugue-form", "name": "Fugue", "display": "赋格", "aliases": ["fugue", "赋格"] },
+        { "id": "passacaglia", "name": "Passacaglia", "display": "帕萨卡利亚", "aliases": ["passacaglia", "帕萨卡利亚"] },
+        { "id": "chaconne", "name": "Chaconne", "display": "恰空", "aliases": ["chaconne", "恰空"] }
+      ]
+    },
+    {
+      "id": "free",
+      "name": "Free",
+      "display": "自由结构",
+      "aliases": [],
+      "children": [
+        { "id": "through-composed", "name": "Through-composed", "display": "通体写法", "aliases": ["through composed", "通谱", "通体"] },
+        { "id": "free-form", "name": "Free Form", "display": "自由曲式", "aliases": ["free form", "自由结构"] },
+        { "id": "ostinato", "name": "Ostinato", "display": "固定音型", "aliases": ["ostinato", "固定音型"] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1d1ss57",
+  "parentId": null,
+  "title": {
+    "original": "神鹿谣",
+    "lang": "zh",
+    "subtitle": "王者荣耀 游戏原声 瑶 遇见神鹿",
+    "aliases": []
+  },
+  "basic": {
+    "meter": "3/4",
+    "meterNote": "听起来又有点像 6/4 或更慢的 6/8",
+    "bpm": 107,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "在瑶以往的云梦泽系列音乐中，我们都用了一些音高打击乐，比如马林巴、钢片琴，以及竖琴等去表现她森林系以及仙气的感觉。而这次遇见神鹿这个皮肤我们在音乐上希望去结合瑶本身的特质和敦煌的色彩。因此在配器上，我们在云梦泽的基础上引入了箜篌和五弦琵琶这两件敦煌壁画上出现次数最多的乐器，从音色上去结合敦煌的印象，而调式上则没有过多地限制在中国传统调式里，而是采用了自然小调，给瑶增添了一些异域的神秘感。在和声色彩上表达了一种从开始的静谧到后来的万物复苏这样逐渐明亮、配器上则是从静到动的感觉。同时在乐队部分，铜管的削弱给乐曲带来更加轻盈和飘逸的听感。",
+    "formNumber": null,
+    "opusNumber": null,
+    "subType": null,
+    "tempoTerm": null
+  },
+  "period": "contemporary",
+  "genre": "OST",
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "HeartStrings_曾怡"
+  },
+  "links": null,
+  "moods": [
+    "dreamy",
+    "mysterious"
+  ],
+  "instrumentation": {
+    "abstract": "中国民族乐器 + 小型弦乐团 + 音高打击乐器组 + 圆号"
+  },
+  "covers": {
+    "single": "covers/神鹿谣-single.jpg"
+  },
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "celesta",
+    "contrabass",
+    "dizi",
+    "erhu",
+    "harp",
+    "horn",
+    "kalimba",
+    "konghou",
+    "mandolin",
+    "pipa",
+    "vibraphone",
+    "viola",
+    "violin-1",
+    "violin-2",
+    "violoncello",
+    "yangqin"
+  ],
+  "derivedTags": [],
+  "techniques": [
+    {
+      "id": "modulation",
+      "root": "harmonic"
+    },
+    {
+      "id": "modulation",
+      "root": "melodic"
+    },
+    {
+      "id": "octave-imitation",
+      "root": "counterpoint"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": -1630,
+    "audioPath": "C:/Users/Administrator/Music/王者荣耀 _ 曾怡 - 神鹿谣.flac",
+    "sections": [
+      {
+        "tick": 1440,
+        "label": "intro"
+      },
+      {
+        "tick": 15840,
+        "label": "A1"
+      },
+      {
+        "tick": 36000,
+        "label": "Transition 1"
+      },
+      {
+        "tick": 47520,
+        "label": "B1"
+      },
+      {
+        "tick": 79200,
+        "label": "A2"
+      },
+      {
+        "tick": 99360,
+        "label": "Transition 2"
+      },
+      {
+        "tick": 110880,
+        "label": "B2"
+      },
+      {
+        "tick": 136800,
+        "label": "A3"
+      },
+      {
+        "tick": 151200,
+        "label": "coda"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 1440,
+        "keyName": "c dorian",
+        "confidence": "confirmed",
+        "note": null
+      },
+      {
+        "tick": 15840,
+        "keyName": "c natural minor",
+        "confidence": "confirmed",
+        "note": null
+      },
+      {
+        "tick": 79200,
+        "keyName": "g natural minor",
+        "confidence": "confirmed",
+        "note": null
+      },
+      {
+        "tick": 99360,
+        "keyName": "f natural minor",
+        "confidence": "uncertain",
+        "note": "not sure, is f natural minor?"
+      },
+      {
+        "tick": 110880,
+        "keyName": "c-sharp natural minor",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [],
+  "extra": {}
+}

@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-1idruf5",
+  "title": {
+    "original": "虚构测试数据 · 晨雾中的长笛",
+    "lang": "zh",
+    "subtitle": "为三支木管而作",
+    "aliases": [
+      "晨雾长笛"
+    ]
+  },
+  "basic": {
+    "meter": "3/4",
+    "meterNote": null,
+    "bpm": 76,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "虚构数据：三支木管在晨雾里依次进入，用来测试多乐器标签与连奏/花舌的组合检索。"
+  },
+  "period": "classical",
+  "genre": "Classical",
+  "compositionType": "chamber-music",
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "虚构作曲",
+    "lyricist": null,
+    "arranger": "虚构编曲",
+    "performer": "虚构演奏组",
+    "mixingEngineer": null,
+    "releaseDate": "2026-01-01"
+  },
+  "links": {
+    "netease": null
+  },
+  "moods": [
+    "calm",
+    "warm"
+  ],
+  "instrumentation": {
+    "abstract": "Flute + Oboe + English Horn"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "english-horn",
+    "flute",
+    "oboe"
+  ],
+  "derivedTags": [
+    {
+      "id": "english-horn",
+      "parent": "woodwind",
+      "name": "English Horn"
+    },
+    {
+      "id": "flute",
+      "parent": "woodwind",
+      "name": "Flute"
+    },
+    {
+      "id": "oboe",
+      "parent": "woodwind",
+      "name": "Oboe"
+    }
+  ],
+  "techniques": [
+    {
+      "id": "doubling",
+      "root": "orchestration"
+    },
+    {
+      "id": "flutter-tongue",
+      "root": "winds"
+    },
+    {
+      "id": "legato-art",
+      "root": "general"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [
+      {
+        "tick": 0,
+        "label": "A"
+      },
+      {
+        "tick": 5760,
+        "label": "B"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "f major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 1440,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1440,
+      "durTicks": 1440,
+      "text": "IV",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 1440,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 4320,
+      "durTicks": 1440,
+      "text": "I",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

@@ -1,0 +1,50 @@
+{
+  "name": "music-atlas",
+  "productName": "miyako",
+  "version": "0.99.0",
+  "private": true,
+  "description": "本地音乐标签库 + 和声分析网格（Electron + Vue）",
+  "license": "Apache-2.0",
+  "author": "elifia-flora",
+  "keywords": [
+    "music",
+    "musicology",
+    "harmonic-analysis",
+    "roman-numeral",
+    "electron",
+    "vue"
+  ],
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "app": "node tools/launch.mjs",
+    "app:debug": "node tools/launch.mjs --debug",
+    "check": "node tools/validate.mjs",
+    "import": "node tools/import.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "smoke": "electron-vite build && node tools/smoke.mjs",
+    "smoke:quiet": "electron-vite build && node tools/smoke.mjs --quiet",
+    "smoke:status": "node tools/smoke-status.mjs",
+    "fix:integrity": "node tools/fix-integrity.mjs",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:mac": "electron-vite build && electron-builder --mac --publish never",
+    "dist:linux": "electron-vite build && electron-builder --linux --publish never"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.1",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "electron": "44.10.1",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "voicing",
+  "name": "和弦组成音",
+  "group": "harmony",
+  "needsContext": null,
+  "note": "记录实际发声的音高集合，用于核对排列、声部间距与转位。绝对音名，不依赖调性。",
+  "lanes": [
+    { "id": "tones", "label": "组成音", "kind": "text", "height": 30, "align": "left", "placeholder": "G B D F" },
+    { "id": "chord", "label": "和弦", "kind": "text", "height": 30, "align": "left", "placeholder": "G7" },
+    { "id": "voicing-note", "label": "排列备注", "kind": "text", "height": 30, "align": "left", "placeholder": "开放排列 / 密集排列" }
+  ]
+}

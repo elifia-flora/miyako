@@ -1,0 +1,736 @@
+{
+  "schemaVersion": 3,
+  "uuid": "trk-ei7owj",
+  "parentId": null,
+  "title": {
+    "original": "The deepest nightmare of Sibyl",
+    "lang": "en",
+    "subtitle": "游戏《爆裂魔女》原声配乐",
+    "aliases": [
+      "希贝尔最深的梦魇"
+    ]
+  },
+  "basic": {
+    "meter": "4/4",
+    "meterNote": null,
+    "bpm": 130,
+    "tempoUnit": "BPM (quarter note as a beat)",
+    "tempoChange": false,
+    "description": "女高音 Solo 加管弦乐队的编制（Orchestra + Soprano Solo）：弦乐组由纽约爱乐录音，木管与铜管由布达佩斯艺术交响乐团录音，人声由 Crystal嘉 担任，十音作曲、大九_LN 作词。调性按降 E 和声小调记谱，大调视角看约等于降 G；和声上用了副属化（tonicization）。资料标注「与乐谱不一样的部分」：第 19–20 小节歌手实为连奏、没有八分音符的断开，第 44 小节的女高音 Solo 以音频为准（四分音符，谱面记的是二分音符接二分音符）。",
+    "formNumber": null,
+    "opusNumber": null,
+    "subType": null,
+    "tempoTerm": null
+  },
+  "period": "contemporary",
+  "genre": "OST",
+  "compositionType": null,
+  "form": null,
+  "album": "爆裂魔女原声集 Burst Witch Original Soundtrack I",
+  "credits": {
+    "composer": "十音",
+    "lyricist": "大九_LN",
+    "performer": "Soprano Solo: Crystal嘉；Strings Section: New York Philharmonic；Woodwinds & Brass Section: Budapest Art Symphony Orchestra",
+    "mixingEngineer": "lbg",
+    "releaseDate": "2021-10-22"
+  },
+  "links": {
+    "netease": "https://music.163.com/song?id=1888597145"
+  },
+  "moods": [
+    "nervous",
+    "tragic",
+    "heroic"
+  ],
+  "instrumentation": {
+    "abstract": "管弦乐队 + 女高音独唱"
+  },
+  "covers": {
+    "album": "covers/The deepest nightmare of Sibyl-album.jpg"
+  },
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [
+    "contrabass",
+    "soprano",
+    "timpani",
+    "viola",
+    "violin-1",
+    "violin-2",
+    "violoncello"
+  ],
+  "derivedTags": [],
+  "techniques": [
+    {
+      "id": "octave-imitation",
+      "root": "counterpoint"
+    },
+    {
+      "id": "tonicization",
+      "root": "harmonic"
+    },
+    {
+      "id": "alveolar-trill",
+      "root": "tech-voice"
+    },
+    {
+      "id": "legato-art",
+      "root": "general"
+    },
+    {
+      "id": "roll",
+      "root": "general"
+    },
+    {
+      "id": "staccato",
+      "root": "general"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": -1880,
+    "audioPath": "C:/Users/Administrator/WorkBuddy/dev/music-atlas/assets/夜莺唱片 - The deepest nightmare of Sibyl（希贝尔最深的梦魇）.flac",
+    "sections": [
+      {
+        "tick": 3840,
+        "label": "Intro"
+      },
+      {
+        "tick": 19200,
+        "label": "A1"
+      },
+      {
+        "tick": 49920,
+        "label": "Interlude"
+      },
+      {
+        "tick": 57600,
+        "label": "A2"
+      },
+      {
+        "tick": 88320,
+        "label": "Outro"
+      }
+    ],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "e-flat harmonic minor",
+        "confidence": "confirmed",
+        "note": "原资料记「E♭ harmonic minor」，大调视角 G♭"
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "chord",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 5760,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 5760,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 5760,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 7680,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 7680,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 7680,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 11520,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 11520,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 11520,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 13440,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 13440,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 13440,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 15360,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 15360,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 15360,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 17280,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 17280,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 17280,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 19200,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 19200,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "function",
+      "tick": 19200,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 19200,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 21120,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 21120,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 21120,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 23040,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 23040,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 23040,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 24960,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 24960,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 24960,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 26880,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 26880,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 26880,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 28800,
+      "durTicks": 1920,
+      "text": "B♭m/D♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 28800,
+      "durTicks": 1920,
+      "text": "iii6/III",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 28800,
+      "durTicks": 1920,
+      "text": "DTIII6/dtIII",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 30720,
+      "durTicks": 1920,
+      "text": "G♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 30720,
+      "durTicks": 1920,
+      "text": "III",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 30720,
+      "durTicks": 1920,
+      "text": "dtIII",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 32640,
+      "durTicks": 1920,
+      "text": "E♭/G",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 32640,
+      "durTicks": 1920,
+      "text": "V6/iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 32640,
+      "durTicks": 1920,
+      "text": "D6/s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 34560,
+      "durTicks": 1920,
+      "text": "A♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 34560,
+      "durTicks": 1920,
+      "text": "iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 34560,
+      "durTicks": 1920,
+      "text": "s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 36480,
+      "durTicks": 1920,
+      "text": "s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 46080,
+      "durTicks": 1920,
+      "text": "Cad64",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 46080,
+      "durTicks": 1920,
+      "text": "K46",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 48000,
+      "durTicks": 1920,
+      "text": "B♭7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 48000,
+      "durTicks": 1920,
+      "text": "V7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 48000,
+      "durTicks": 1920,
+      "text": "D7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 57600,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 57600,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 57600,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 59520,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 59520,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 59520,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 61440,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 61440,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 61440,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 63360,
+      "durTicks": 1920,
+      "text": "Fm7♭5/E♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 63360,
+      "durTicks": 1920,
+      "text": "iiø42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 63360,
+      "durTicks": 1920,
+      "text": "sII2",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 65280,
+      "durTicks": 1920,
+      "text": "E♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 65280,
+      "durTicks": 1920,
+      "text": "i",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 65280,
+      "durTicks": 1920,
+      "text": "t",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 67200,
+      "durTicks": 1920,
+      "text": "B♭m/D♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 67200,
+      "durTicks": 1920,
+      "text": "iii6/III",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 67200,
+      "durTicks": 1920,
+      "text": "DTIII6/dtIII",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 69120,
+      "durTicks": 1920,
+      "text": "G♭",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 69120,
+      "durTicks": 1920,
+      "text": "III",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 69120,
+      "durTicks": 1920,
+      "text": "dtIII",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 71040,
+      "durTicks": 1920,
+      "text": "E♭/G",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 71040,
+      "durTicks": 1920,
+      "text": "V6/iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 71040,
+      "durTicks": 1920,
+      "text": "D6/s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 72960,
+      "durTicks": 1920,
+      "text": "A♭m",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 72960,
+      "durTicks": 1920,
+      "text": "iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 72960,
+      "durTicks": 1920,
+      "text": "s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 84480,
+      "durTicks": 1920,
+      "text": "Cad64",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 84480,
+      "durTicks": 1920,
+      "text": "K46",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "chord",
+      "tick": 86400,
+      "durTicks": 1920,
+      "text": "B♭7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 86400,
+      "durTicks": 1920,
+      "text": "V7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 86400,
+      "durTicks": 1920,
+      "text": "D7",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

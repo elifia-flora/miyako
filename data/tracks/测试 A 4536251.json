@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 3,
+  "uuid": "tr-mvddivatpwe",
+  "title": {
+    "original": "测试 A 4536251",
+    "lang": null,
+    "subtitle": null,
+    "aliases": []
+  },
+  "basic": {
+    "meter": "2/4",
+    "meterNote": null,
+    "bpm": 96,
+    "tempoUnit": null,
+    "tempoChange": false,
+    "description": null
+  },
+  "period": null,
+  "genre": null,
+  "compositionType": null,
+  "form": null,
+  "album": null,
+  "credits": {
+    "composer": "佚名"
+  },
+  "links": null,
+  "moods": [
+    "melancholy",
+    "sad",
+    "mysterious",
+    "爱情",
+    "苦情歌"
+  ],
+  "instrumentation": {
+    "abstract": "Orchestra"
+  },
+  "covers": null,
+  "lyrics": null,
+  "instrumental": null,
+  "instrumentIds": [],
+  "derivedTags": [],
+  "techniques": [
+    {
+      "id": "divisi",
+      "root": "orchestration"
+    },
+    {
+      "id": "melodic-inversion",
+      "root": "melodic"
+    },
+    {
+      "id": "modulation",
+      "root": "harmonic"
+    },
+    {
+      "id": "modulation",
+      "root": "melodic"
+    },
+    {
+      "id": "staccato",
+      "root": "general"
+    }
+  ],
+  "timeline": {
+    "ppq": 480,
+    "audioOffsetMs": 0,
+    "audioPath": null,
+    "sections": [],
+    "keys": [
+      {
+        "tick": 0,
+        "keyName": "A major",
+        "confidence": "confirmed",
+        "note": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "lane": "degree",
+      "tick": 0,
+      "durTicks": 960,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 960,
+      "durTicks": 960,
+      "text": "IV",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 960,
+      "durTicks": 960,
+      "text": "s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 1920,
+      "durTicks": 960,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "sposobin",
+      "tick": 1920,
+      "durTicks": 960,
+      "text": "s",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 2880,
+      "durTicks": 1440,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 4320,
+      "durTicks": 480,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 4800,
+      "durTicks": 960,
+      "text": "IV",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 5760,
+      "durTicks": 960,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 6720,
+      "durTicks": 960,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 7680,
+      "durTicks": 960,
+      "text": "iv",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 8640,
+      "durTicks": 960,
+      "text": "V42",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 9600,
+      "durTicks": 960,
+      "text": "I6",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 10560,
+      "durTicks": 960,
+      "text": "vi",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 11520,
+      "durTicks": 960,
+      "text": "ii",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 12480,
+      "durTicks": 960,
+      "text": "V7sus4",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 13440,
+      "durTicks": 960,
+      "text": "I",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 16320,
+      "durTicks": 960,
+      "text": "IV",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 17280,
+      "durTicks": 960,
+      "text": "V",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 18240,
+      "durTicks": 960,
+      "text": "iii7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 19200,
+      "durTicks": 960,
+      "text": "vi",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 20160,
+      "durTicks": 960,
+      "text": "ii7",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 21120,
+      "durTicks": 960,
+      "text": "V9sus4",
+      "confidence": "confirmed"
+    },
+    {
+      "lane": "degree",
+      "tick": 22080,
+      "durTicks": 960,
+      "text": "I",
+      "confidence": "confirmed"
+    }
+  ],
+  "extra": {}
+}

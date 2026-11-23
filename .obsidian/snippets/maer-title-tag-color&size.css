@@ -1,0 +1,54 @@
+body {
+  --h1-color: rgb(200, 0, 0);
+  --h2-color: rgb(200, 110, 0);
+  --h3-color: rgb(200, 165, 0);
+  --h4-color: rgb(200, 0, 0);
+  --h5-color: rgb(200, 110, 0);
+  --h6-color: rgb(150, 255, 0); 
+
+  --h1-size: 36px;
+  /* 呃呃，为什么光调大字体，它就不粗了啊？ */
+  --h1-size: 2.3em;
+  --h1-weight: 700;
+  /* 加字重和风格也不起效果 */
+  --h1-font: Microsoft YaHei;
+  /* 指定一下字体试试，嗯，有效果，就这样吧 */
+  /* Microsoft YaHei */
+
+  --graph-node-focused: red;
+  /* --graph-node: green; */
+  --graph-node-tag: rgb(255, 165, 0);
+  --tag-color: rgb(255, 165, 0);
+  --tag-background: rgb(100, 80, 0);
+
+  /* --link-unresolved-color: rgb(255, 165, 0); */
+  --link-external-color: rgb(255, 165, 0);
+  /* --link-external-decoration: rgb(255, 165, 0); */
+}
+
+/* 标题颜色组 配色方案1（默认）：
+  --h1-color: rgb(200, 0, 0);
+  --h2-color: rgb(200, 110, 0);
+  --h3-color: rgb(200, 165, 0);
+  --h4-color: rgb(200, 110, 0);
+  --h5-color: rgb(150, 255, 0);
+  --h6-color: rgb(150, 255, 0); 
+*/
+
+/* 标题颜色组 配色方案2：
+  --h1-color: rgb(200,0,0);
+  --h2-color: rgb(200,0,0);
+  --h3-color: rgb(200, 110, 0);
+  --h4-color: rgb(200, 165, 0);
+  --h5-color: rgb(150, 255, 0);
+  --h6-color: rgb(150, 255, 0); 
+*/
+
+  /* 标题颜色组 配色方案3：
+  --h1-color: rgb(0,150,0);
+  --h2-color: rgb(0, 150, 150);
+  --h3-color: rgb(200, 110, 0);
+  --h4-color: rgb(200, 165, 0);
+  --h5-color: rgb(150, 255, 0);
+  --h6-color: rgb(150, 255, 0);
+   */
