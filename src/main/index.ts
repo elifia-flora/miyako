@@ -13,6 +13,7 @@ import {
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { isAllowedExternal, isAppPage } from './nav-policy.js';
 import { openDb, resolveDataDir, type DbHandle } from './db/open';
 import { loadVocab, syncVocab, type VocabSet } from './vocab/load';
 import { seedFromTracks } from './import/seed';
@@ -404,61 +405,62 @@ function boot() {
 /* ==================== 渲染层安全设置 ==================== */
 
 /**
- * 所有窗口共用的 webPreferences。
+ * 渲染进程沙箱。默认开：preload 只用了 `contextBridge` + `ipcRenderer`（见 src/preload/index.ts），
+ * 在沙箱里完全够用；关掉沙箱等于让每个渲染进程都带着完整的 Node 能力跑。
  *
- * - `sandbox: true`：preload 只用了 `contextBridge` + `ipcRenderer`（见 src/preload/index.ts），
- *   在沙箱里完全够用；关掉沙箱等于让每个渲染进程都带着完整的 Node 能力跑。
- * - 以前七个窗口各抄一份，改一处漏一处；现在只有这一份，窗口自己的差异（如
- *   `backgroundThrottling`）作为 `extra` 传进来。
+ * 对开发 / 调试的影响：DevTools、`npm run app:debug` 的 CDP 端口、冒烟里的
+ * `webContents.executeJavaScript` / `capturePage` 都不受沙箱影响（整套冒烟在沙箱下跑过，结果与关沙箱时一致）。
+ * 受影响的只有「在 preload 里直接用 Node 模块」—— 这类需求请走 IPC 交给主进程。
+ *
+ * 逃生阀：**仅开发模式**（未打包）下 `MA_RENDERER_SANDBOX=0` 可以临时关掉，用来排查
+ * 「是不是沙箱导致的」这类问题；打包后的应用忽略这个变量，永远开着。
+ * 注意它不是 `--no-sandbox`：那个会关掉整个 Chromium 的进程沙箱，见 docs/ELECTRON-UPGRADE.md。
+ */
+const RENDERER_SANDBOX = app.isPackaged || process.env.MA_RENDERER_SANDBOX !== '0';
+if (!RENDERER_SANDBOX) console.warn('[security] MA_RENDERER_SANDBOX=0：开发模式下临时关闭渲染进程沙箱');
+
+/**
+ * 所有窗口共用的 webPreferences。以前七个窗口各抄一份，改一处漏一处；
+ * 现在只有这一份，窗口自己的差异（如 `backgroundThrottling`）作为 `extra` 传进来。
  */
 function securePrefs(extra: Electron.WebPreferences = {}): Electron.WebPreferences {
   return {
     ...extra,
     preload: path.join(__dirname, '../preload/index.js'),
     contextIsolation: true,
-    sandbox: true,
+    sandbox: RENDERER_SANDBOX,
     nodeIntegration: false,
     webSecurity: true,
   };
 }
 
-/** 只有 http / https 链接才交给系统浏览器；file: / 自定义协议 / 其它 scheme 一律不开 */
-function isWebUrl(url: string): boolean {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'https:' || u.protocol === 'http:';
-  } catch {
-    return false;
-  }
-}
-
-/** 渲染层自己的页面（dev server 或打包后的 index.html），忽略 hash / query */
-function isAppPage(url: string): boolean {
-  try {
-    const u = new URL(url);
-    const dev = process.env.ELECTRON_RENDERER_URL;
-    if (dev) return u.origin === new URL(dev).origin;
-    const page = pathToFileURL(path.join(__dirname, '../renderer/index.html'));
-    return u.protocol === 'file:' && u.pathname === page.pathname;
-  } catch {
-    return false;
-  }
+/** 渲染层自己的页面（dev server 或打包后的 index.html） */
+function appPageInfo() {
+  return {
+    devUrl: process.env.ELECTRON_RENDERER_URL ?? null,
+    pageUrl: pathToFileURL(path.join(__dirname, '../renderer/index.html')).href,
+  };
 }
 
 /**
  * 对**每一个** webContents（含子窗口）生效：
- * - `window.open` / 新窗口：网页链接交给系统浏览器，应用内一律不开新窗口；
- * - 页面跳转：只允许留在应用自己的页面上。把文件拖进窗口时 Chromium 默认会「导航到那个文件」，
- *   整个界面被替换掉、还带着 preload —— 这里直接拦下。
+ * - `window.open` / 新窗口：http(s) 与网易云（orpheus:）交给系统打开，应用内一律不开新窗口；
+ * - 页面跳转：只允许留在应用自己的页面上。允许外开的地址照样交给系统打开；其余（如把文件拖进窗口时
+ *   Chromium 默认的「导航到这个文件」，整个界面会被替换掉）直接拦下。
+ *
+ * 网易云「打开 / 唤起客户端播放」走的是 IPC（netease:open → openMusicLink），不经过这里。
+ * 规则本身在 nav-policy.js，有单测。
  */
 function installNavigationGuards() {
   app.on('web-contents-created', (_e, contents) => {
     contents.setWindowOpenHandler(({ url }) => {
-      if (isWebUrl(url)) void shell.openExternal(url);
+      if (isAllowedExternal(url)) void shell.openExternal(url);
       return { action: 'deny' };
     });
     contents.on('will-navigate', (ev, url) => {
-      if (!isAppPage(url)) ev.preventDefault();
+      if (isAppPage(url, appPageInfo())) return;
+      ev.preventDefault();
+      if (isAllowedExternal(url)) void shell.openExternal(url);
     });
   });
 }

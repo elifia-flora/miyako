@@ -302,6 +302,15 @@ export async function runSmoke(H: SmokeHost) {
   // 界面切到被测曲目，并强制深色：主题存在 localStorage 里，
   // 上一轮如果停在浅色，「切浅色」这条断言就会拿浅色当基准，永远不可能通过。
   // 语言同理：上一轮若停在英文（或跑一半崩在英文），后面所有中文文案断言都会假失败。
+  /**
+   * 渲染层的冒烟钩子（window.__app）在 App.vue 的 onMounted 里、等完 meta / 词表标签之后才挂上；
+   * did-finish-load 之后马上调用会撞上「还没挂」—— 机器一忙就整轮语言没切过来、后面一串假失败。
+   * 先等它就绪（最多 10 秒），而不是赌时序。
+   */
+  for (let i = 0; i < 200; i++) {
+    if ((await js(`typeof window.__app === 'object' && window.__app !== null`)) === true) break;
+    await wait(50);
+  }
   await js(`window.__app.lang('zh')`);
   // 面板开合也是持久化状态（localStorage）。上一轮若崩在「面板关掉」之后，
   // 这一轮下面那条 DOM 高度断言会拿到 0 —— 跟功能没关系，纯粹是没归位。
