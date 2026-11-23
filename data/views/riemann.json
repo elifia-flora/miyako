@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "riemann",
+  "name": "黎曼功能分析",
+  "group": "harmony",
+  "needsContext": "key",
+  "note": "德式功能标记（T / S / D 及 Tp、sP、D7 等派生）。相对当前调性，与 roman 视图共享同一事件但换一套符号。",
+  "lanes": [
+    { "id": "function", "label": "功能", "kind": "text", "height": 30, "align": "center", "placeholder": "D7 → T" },
+    { "id": "chord", "label": "实际和弦", "kind": "text", "height": 30, "align": "left", "placeholder": "G7" },
+    { "id": "note", "label": "备注", "kind": "text", "height": 30, "align": "left" }
+  ]
+}

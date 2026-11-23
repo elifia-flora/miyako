@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "roman",
+  "name": "罗马数字级数",
+  "group": "harmony",
+  "needsContext": "key",
+  "note": "级数相对于当前调性。渲染时取该 tick 之前最近的 key marker；没有则整列显示『未定义调性』。本视图写泳道 `degree`；绝对和弦在字母和弦视图的 `chord` 行，两者是两份数据。",
+  "lanes": [
+    { "id": "degree", "label": "级数", "kind": "text", "height": 30, "align": "left", "placeholder": "V7/ii" },
+    { "id": "bass", "label": "低音", "kind": "note", "height": 30 },
+    { "id": "note", "label": "备注", "kind": "text", "height": 30, "align": "left" }
+  ]
+}

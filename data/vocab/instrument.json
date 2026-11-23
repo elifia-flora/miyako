@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "dim": "instrument",
+  "note": "43 项标准管弦乐器来自 instrument.xlsx；chinese/world 两组为样本曲目中实际出现、但原表未覆盖的乐器。id 一旦定下永不变，改名只改 display。",
+  "roots": [
+    {
+      "id": "woodwind",
+      "name": "woodwind",
+      "display": "木管",
+      "children": [
+        { "id": "flute", "name": "Flute", "display": "长笛", "aliases": ["flute", "长笛"] },
+        { "id": "piccolo", "name": "Piccolo", "display": "短笛", "aliases": ["piccolo", "短笛"] },
+        { "id": "alto-flute", "name": "Alto Flute", "display": "中音长笛", "aliases": ["alto flute", "中音长笛"] },
+        { "id": "bass-flute", "name": "Bass Flute", "display": "低音长笛", "aliases": ["bass flute", "低音长笛"] },
+        { "id": "oboe", "name": "Oboe", "display": "双簧管", "aliases": ["oboe", "双簧管"] },
+        { "id": "english-horn", "name": "English Horn", "display": "英国管", "aliases": ["english horn", "cor anglais", "英国管"] },
+        { "id": "clarinet", "name": "Clarinet", "display": "单簧管", "aliases": ["clarinet", "单簧管", "黑管"] },
+        { "id": "bass-clarinet", "name": "Bass Clarinet", "display": "低音单簧管", "aliases": ["bass clarinet", "低音单簧管"] },
+        { "id": "bassoon", "name": "Bassoon", "display": "大管", "aliases": ["bassoon", "大管", "巴松"] },
+        { "id": "contrabassoon", "name": "Contrabassoon", "display": "低音大管", "aliases": ["contrabassoon", "低音大管"] }
+      ]
+    },
+    {
+      "id": "brass",
+      "name": "brass",
+      "display": "铜管",
+      "children": [
+        { "id": "horn", "name": "Horn", "display": "圆号", "aliases": ["horn", "french horn", "圆号", "法国号"] },
+        { "id": "trumpet", "name": "Trumpet", "display": "小号", "aliases": ["trumpet", "小号"] },
+        { "id": "trombone", "name": "Trombone", "display": "长号", "aliases": ["trombone", "长号"] },
+        { "id": "bass-trombone", "name": "Bass Trombone", "display": "低音长号", "aliases": ["bass trombone", "低音长号"] },
+        { "id": "tuba", "name": "Tuba", "display": "大号", "aliases": ["tuba", "大号"] }
+      ]
+    },
+    {
+      "id": "strings",
+      "name": "strings",
+      "display": "弦乐",
+      "children": [
+        { "id": "violin", "name": "Violin", "display": "小提琴", "aliases": ["violin", "violins", "小提琴"] },
+        { "id": "violin-1", "name": "Violins 1", "display": "第一小提琴", "aliases": ["violins 1", "violin 1", "violin i", "第一小提琴"] },
+        { "id": "violin-2", "name": "Violins 2", "display": "第二小提琴", "aliases": ["violins 2", "violin 2", "violin ii", "第二小提琴"] },
+        { "id": "viola", "name": "Viola", "display": "中提琴", "aliases": ["viola", "violas", "中提琴"] },
+        { "id": "violoncello", "name": "Violoncello", "display": "大提琴", "aliases": ["cello", "violoncello", "violoncellos", "大提琴"] },
+        { "id": "contrabass", "name": "Contrabass", "display": "低音提琴", "aliases": ["contrabass", "double bass", "低音提琴"] },
+        { "id": "harp", "name": "Harp", "display": "竖琴", "aliases": ["harp", "竖琴"] }
+      ]
+    },
+    {
+      "id": "percussion",
+      "name": "percussion",
+      "display": "打击乐",
+      "children": [
+        { "id": "timpani", "name": "Timpani", "display": "定音鼓", "aliases": ["timpani", "kettledrum", "定音鼓"] },
+        { "id": "snare-drum", "name": "Snare Drum", "display": "小鼓", "aliases": ["snare drum", "snare", "小鼓", "军鼓"] },
+        { "id": "bass-drum", "name": "Bass Drum", "display": "大鼓", "aliases": ["bass drum", "大鼓"] },
+        { "id": "tom-tom", "name": "Tom-tom", "display": "嗵鼓", "aliases": ["tom-tom", "tom", "嗵鼓"] },
+        { "id": "triangle", "name": "Triangle", "display": "三角铁", "aliases": ["triangle", "三角铁"] },
+        { "id": "tambourine", "name": "Tambourine", "display": "铃鼓", "aliases": ["tambourine", "铃鼓"] },
+        { "id": "wood-blocks", "name": "Wood Blocks", "display": "木鱼", "aliases": ["wood block", "wood blocks", "木鱼"] },
+        { "id": "cymbals", "name": "Cymbals", "display": "镲", "aliases": ["cymbals", "cymbal", "镲"] },
+        { "id": "piatti", "name": "Piatti", "display": "对镲", "aliases": ["piatti", "对镲"] },
+        { "id": "tam-tam", "name": "Tam-tam", "display": "大锣", "aliases": ["tam-tam", "tamtam", "大锣"] },
+        { "id": "gong", "name": "Gong", "display": "锣", "aliases": ["gong", "锣"] },
+        { "id": "anvil", "name": "Anvil", "display": "铁砧", "aliases": ["anvil", "铁砧"] }
+      ]
+    },
+    {
+      "id": "mallet",
+      "name": "mallet",
+      "display": "音高打击",
+      "children": [
+        { "id": "tubular-bell", "name": "Tubular Bell", "display": "管钟", "aliases": ["tubular bell", "chimes", "管钟"] },
+        { "id": "glockenspiel", "name": "Glockenspiel", "display": "钟琴", "aliases": ["glockenspiel", "钟琴"] },
+        { "id": "xylophone", "name": "Xylophone", "display": "木琴", "aliases": ["xylophone", "木琴"] },
+        { "id": "marimba", "name": "Marimba", "display": "马林巴", "aliases": ["marimba", "马林巴"] },
+        { "id": "vibraphone", "name": "Vibraphone", "display": "颤音琴", "aliases": ["vibraphone", "vibes", "颤音琴"] }
+      ]
+    },
+    {
+      "id": "keyboard",
+      "name": "keyboard",
+      "display": "键盘",
+      "children": [
+        { "id": "piano", "name": "Piano", "display": "钢琴", "aliases": ["piano", "pianoforte", "钢琴"] },
+        { "id": "celesta", "name": "Celesta", "display": "钢片琴", "aliases": ["celesta", "celeste", "钢片琴"] }
+      ]
+    },
+    {
+      "id": "voice",
+      "name": "voice",
+      "display": "人声",
+      "children": [
+        { "id": "soprano", "name": "Soprano", "display": "女高音", "aliases": ["soprano", "女高音"] },
+        { "id": "alto", "name": "Alto", "display": "女低音", "aliases": ["alto", "contralto", "女低音"] },
+        { "id": "tenor", "name": "Tenor", "display": "男高音", "aliases": ["tenor", "男高音"] },
+        { "id": "voice-bass", "name": "Bass", "display": "男低音", "aliases": ["bass voice", "男低音"] }
+      ]
+    },
+    {
+      "id": "chinese",
+      "name": "chinese",
+      "display": "民族乐器",
+      "note": "原表未覆盖，来自样本曲目实际配器",
+      "children": [
+        { "id": "pipa", "name": "Pipa (5-Strings)", "display": "五弦琵琶", "aliases": ["pipa", "琵琶", "五弦琵琶", "pipa (5-strings)"] },
+        { "id": "konghou", "name": "Konghou", "display": "箜篌", "aliases": ["konghou", "箜篌"] },
+        { "id": "erhu", "name": "Erhu", "display": "二胡", "aliases": ["erhu", "二胡"] },
+        { "id": "yangqin", "name": "Yangqin", "display": "扬琴", "aliases": ["yangqin", "扬琴"] },
+        { "id": "dizi", "name": "Dizi", "display": "笛子", "aliases": ["dizi", "笛子", "竹笛"] }
+      ]
+    },
+    {
+      "id": "world",
+      "name": "world",
+      "display": "世界乐器",
+      "children": [
+        { "id": "kalimba", "name": "Kalimba", "display": "卡林巴", "aliases": ["kalimba", "卡林巴", "拇指琴"] },
+        { "id": "mandolin", "name": "Mandolin", "display": "曼陀林", "aliases": ["mandolin", "曼陀林"] }
+      ]
+    }
+  ]
+}

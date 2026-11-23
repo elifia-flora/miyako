@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 2,
+  "note": "和弦符号补全：字母和弦 = 音名 × 变音记号 × 性质；级数和弦按这里的性质顺序补全。数组顺序就是补全顺序，可用编辑器上移/下移。别名只进说明，不复制候选行。",
+  "letters": [
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "A",
+    "B"
+  ],
+  "accidentals": [
+    {
+      "sign": "",
+      "label": "本位（还原）"
+    },
+    {
+      "sign": "♯",
+      "label": "升"
+    },
+    {
+      "sign": "♭",
+      "label": "降"
+    },
+    {
+      "sign": "𝄪",
+      "label": "重升"
+    },
+    {
+      "sign": "𝄫",
+      "label": "重降"
+    }
+  ],
+  "qualities": [
+    {
+      "suffix": "",
+      "label": "大三和弦",
+      "primary": true
+    },
+    {
+      "suffix": "m",
+      "label": "小三和弦",
+      "primary": true,
+      "aliases": [
+        "min"
+      ]
+    },
+    {
+      "suffix": "7",
+      "label": "属七",
+      "primary": true
+    },
+    {
+      "suffix": "7sus4",
+      "label": "属七挂四",
+      "primary": true,
+      "aliases": [
+        "7sus"
+      ]
+    },
+    {
+      "suffix": "7♭9",
+      "label": "属七降九",
+      "primary": false,
+      "aliases": [
+        "7b9"
+      ]
+    },
+    {
+      "suffix": "7sub6",
+      "label": "属七 · 六音替五音",
+      "primary": false
+    },
+    {
+      "suffix": "(6/9)",
+      "label": "六九和弦",
+      "primary": true,
+      "aliases": [
+        "6/9",
+        "69"
+      ]
+    },
+    {
+      "suffix": "ø7",
+      "label": "半减七 · 原位",
+      "primary": false
+    },
+    {
+      "suffix": "ø65",
+      "label": "半减七 · 五六",
+      "primary": false
+    },
+    {
+      "suffix": "ø43",
+      "label": "半减七 · 三四",
+      "primary": false
+    },
+    {
+      "suffix": "ø42",
+      "label": "半减七 · 二",
+      "primary": false
+    },
+    {
+      "suffix": "m7b5",
+      "label": "半减七（m7b5）",
+      "primary": false,
+      "aliases": [
+        "ø",
+        "min7b5"
+      ]
+    },
+    {
+      "suffix": "sus2",
+      "label": "挂二",
+      "primary": true
+    },
+    {
+      "suffix": "sus4",
+      "label": "挂四",
+      "primary": true,
+      "aliases": [
+        "sus"
+      ]
+    },
+    {
+      "suffix": "sub6",
+      "label": "六音替五音",
+      "primary": true
+    },
+    {
+      "suffix": "maj7",
+      "label": "大七",
+      "primary": true
+    },
+    {
+      "suffix": "maj9",
+      "label": "大九"
+    },
+    {
+      "suffix": "maj13",
+      "label": "大十三"
+    },
+    {
+      "suffix": "maj♯11",
+      "label": "大七升十一"
+    },
+    {
+      "suffix": "maj13(♯11)",
+      "label": "大十三升十一"
+    },
+    {
+      "suffix": "maj11",
+      "label": "大十一"
+    },
+    {
+      "suffix": "m7",
+      "label": "小七",
+      "primary": true,
+      "aliases": [
+        "min7"
+      ]
+    },
+    {
+      "suffix": "dim",
+      "label": "减三",
+      "primary": true,
+      "aliases": [
+        "°",
+        "o"
+      ]
+    },
+    {
+      "suffix": "dim7",
+      "label": "减七",
+      "primary": false,
+      "aliases": [
+        "°7",
+        "o7"
+      ]
+    },
+    {
+      "suffix": "aug",
+      "label": "增三",
+      "primary": false,
+      "aliases": [
+        "+"
+      ]
+    },
+    {
+      "suffix": "add2",
+      "label": "加二音",
+      "primary": false
+    },
+    {
+      "suffix": "add4",
+      "label": "加四音",
+      "primary": false
+    },
+    {
+      "suffix": "add6",
+      "label": "加六音",
+      "primary": false
+    },
+    {
+      "suffix": "6",
+      "label": "六和弦",
+      "primary": false
+    },
+    {
+      "suffix": "add9",
+      "label": "加九",
+      "primary": false
+    },
+    {
+      "suffix": "9",
+      "label": "九和弦",
+      "primary": false
+    },
+    {
+      "suffix": "m9",
+      "label": "小九",
+      "primary": false,
+      "aliases": [
+        "min9"
+      ]
+    }
+  ]
+}

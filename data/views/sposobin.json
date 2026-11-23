@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "sposobin",
+  "name": "斯波索宾体系",
+  "group": "harmony",
+  "needsContext": "key",
+  "note": "苏俄（斯波索宾）体系和声标记：T / T6 / T46 / D7 / D56 / D34 / D2 / K46（转位数字先小后大）。原位三和弦不带数字；四六按苏俄习惯写作 46。与罗马数字是**两套独立记录**（这里手改的不会被级数覆盖，只有右键菜单「获取…」才会覆盖）。写法规则：大小写跟和弦性质（大调可借小 s，小调的和声属和弦大写 D）；副和弦级数永远大写（SII / DTIII / tsVI / dtVII / DVII）。K46（终止四六）由解析器识别。离调用斜杠写法：`DTIII6/dtIII`（前=应用和弦在临时主音调里的名字，后=目标在本调的名字）。",
+  "lanes": [
+    {
+      "id": "sposobin",
+      "label": "和弦标记",
+      "kind": "text",
+      "height": 30,
+      "align": "left",
+      "placeholder": "K46"
+    },
+    {
+      "id": "note",
+      "label": "备注",
+      "kind": "text",
+      "height": 30,
+      "align": "left"
+    }
+  ]
+}

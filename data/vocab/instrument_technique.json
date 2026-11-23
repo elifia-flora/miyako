@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "dim": "instrument_technique",
+  "note": "乐器演奏技法（instrument technique）：演奏者手上的动作，落在具体乐器上。与 composition（作曲技法：模进、转调、模仿……）是两件事——同一条乐谱，换一种演奏法就换了一种音色。按乐器族分组（分组根用 tech- 前缀，tag.id 是全局唯一的，不能和乐器维度的 strings / brass 撞名）；同一 id 允许挂多个根（如 glissando 既是弦乐滑音也是键盘刮奏，但分别用 glissando 与 keyboard-gliss 两个 id，避免别名冲突）。",
+  "roots": [
+    {
+      "id": "tech-strings",
+      "name": "strings",
+      "display": "弦乐技法",
+      "children": [
+        { "id": "arco", "name": "arco", "display": "运弓", "aliases": ["arco", "运弓", "弓奏"] },
+        { "id": "pizzicato", "name": "pizzicato", "display": "拨奏", "aliases": ["pizzicato", "pizz", "拨奏", "拨弦"] },
+        { "id": "snap-pizzicato", "name": "snap pizzicato", "display": "巴托克拨弦", "aliases": ["snap pizzicato", "bartok pizzicato", "巴托克拨弦", "鞭击拨弦"] },
+        { "id": "spiccato", "name": "spiccato", "display": "跳弓", "aliases": ["spiccato", "跳弓"] },
+        { "id": "detache", "name": "détaché", "display": "分弓", "aliases": ["détaché", "detache", "分弓"] },
+        { "id": "legato-bow", "name": "legato", "display": "连弓", "aliases": ["legato bowing", "连弓"] },
+        { "id": "tremolo-strings", "name": "tremolo (strings)", "display": "弦乐震音", "aliases": ["string tremolo", "弦乐震音", "震音"] },
+        { "id": "vibrato", "name": "vibrato", "display": "揉弦", "aliases": ["vibrato", "揉弦", "颤指"] },
+        { "id": "con-sordino", "name": "con sordino", "display": "加弱音器", "aliases": ["con sordino", "muted", "弱音器", "加弱音器"] },
+        { "id": "sul-tasto", "name": "sul tasto", "display": "靠指板", "aliases": ["sul tasto", "靠指板", "指板上"] },
+        { "id": "sul-ponticello", "name": "sul ponticello", "display": "靠琴桥", "aliases": ["sul ponticello", "靠琴桥", "琴桥"] },
+        { "id": "col-legno", "name": "col legno", "display": "用弓杆", "aliases": ["col legno", "用弓杆", "弓杆击弦"] },
+        { "id": "harmonics-natural", "name": "natural harmonics", "display": "自然泛音", "aliases": ["natural harmonics", "自然泛音", "泛音"] },
+        { "id": "harmonics-artificial", "name": "artificial harmonics", "display": "人工泛音", "aliases": ["artificial harmonics", "人工泛音"] },
+        { "id": "glissando", "name": "glissando", "display": "滑音", "aliases": ["glissando", "gliss", "滑音", "滑奏"] },
+        { "id": "portamento", "name": "portamento", "display": "滑唱式换把", "aliases": ["portamento", "换把滑音"] },
+        { "id": "double-stop", "name": "double stop", "display": "双音", "aliases": ["double stop", "双音", "三音"] }
+      ]
+    },
+    {
+      "id": "winds",
+      "name": "winds",
+      "display": "管乐技法",
+      "children": [
+        { "id": "flutter-tongue", "name": "flutter tongue", "display": "花舌", "aliases": ["flutter tongue", "flutter-tonguing", "花舌"] },
+        { "id": "multiphonic", "name": "multiphonic", "display": "复音", "aliases": ["multiphonic", "复音", "双音管乐"] },
+        { "id": "air-sound", "name": "air sound", "display": "气声", "aliases": ["air sound", "气声", "气声吹奏"] },
+        { "id": "key-click", "name": "key click", "display": "按键声", "aliases": ["key click", "按键声", "键噪"] },
+        { "id": "slap-tongue", "name": "slap tongue", "display": "拍舌", "aliases": ["slap tongue", "拍舌"] },
+        { "id": "overblow", "name": "overblow", "display": "超吹", "aliases": ["overblow", "超吹"] },
+        { "id": "growl-wind", "name": "growl", "display": "咆哮音", "aliases": ["growl (wind)", "咆哮音", "粗声"] }
+      ]
+    },
+    {
+      "id": "tech-brass",
+      "name": "brass",
+      "display": "铜管技法",
+      "children": [
+        { "id": "straight-mute", "name": "straight mute", "display": "直弱音器", "aliases": ["straight mute", "直弱音器"] },
+        { "id": "cup-mute", "name": "cup mute", "display": "杯形弱音器", "aliases": ["cup mute", "杯形弱音器"] },
+        { "id": "harmon-mute", "name": "harmon mute", "display": "哈蒙弱音器", "aliases": ["harmon mute", "哈蒙弱音器", "哇音弱音器"] },
+        { "id": "plunger-mute", "name": "plunger mute", "display": "活塞弱音器", "aliases": ["plunger mute", "活塞弱音器"] },
+        { "id": "half-valve", "name": "half valve", "display": "半按阀", "aliases": ["half valve", "半按阀", "半阀"] },
+        { "id": "rip", "name": "rip", "display": "上滑", "aliases": ["rip", "上滑音", "级进上滑"] },
+        { "id": "fall", "name": "fall", "display": "下滑", "aliases": ["fall", "下滑音"] }
+      ]
+    },
+    {
+      "id": "tech-keyboard",
+      "name": "keyboard",
+      "display": "键盘技法",
+      "children": [
+        { "id": "sustain-pedal", "name": "sustain pedal", "display": "延音踏板", "aliases": ["sustain pedal", "damper pedal", "延音踏板"] },
+        { "id": "una-corda", "name": "una corda", "display": "弱音踏板", "aliases": ["una corda", "soft pedal", "弱音踏板"] },
+        { "id": "prepared-piano", "name": "prepared piano", "display": "预置钢琴", "aliases": ["prepared piano", "预置钢琴", "加料钢琴"] },
+        { "id": "keyboard-gliss", "name": "keyboard glissando", "display": "刮奏", "aliases": ["keyboard glissando", "刮奏", "刮键"] },
+        { "id": "pizzicato-strings-inside", "name": "inside piano", "display": "琴内演奏", "aliases": ["inside piano", "琴内演奏", "拨弦钢琴"] }
+      ]
+    },
+    {
+      "id": "tech-percussion",
+      "name": "percussion",
+      "display": "打击技法",
+      "children": [
+        { "id": "rim-shot", "name": "rim shot", "display": "边击", "aliases": ["rim shot", "rimshot", "边击"] },
+        { "id": "brush", "name": "brush", "display": "鼓刷", "aliases": ["brush", "鼓刷", "刷奏"] },
+        { "id": "tech-mallet", "name": "mallet", "display": "槌击", "aliases": ["mallet", "槌击", "琴槌"] },
+        { "id": "dead-stroke", "name": "dead stroke", "display": "闷击", "aliases": ["dead stroke", "闷击", "止音击"] },
+        { "id": "bowed-cymbal", "name": "bowed cymbal", "display": "弓镲", "aliases": ["bowed cymbal", "弓镲", "拉镲"] }
+      ]
+    },
+    {
+      "id": "tech-voice",
+      "name": "voice",
+      "display": "人声技法",
+      "children": [
+        { "id": "falsetto", "name": "falsetto", "display": "假声", "aliases": ["falsetto", "假声"] },
+        { "id": "whisper-voice", "name": "whisper", "display": "气声唱法", "aliases": ["whisper vocal", "气声唱法", "耳语"] },
+        { "id": "sprechstimme", "name": "Sprechstimme", "display": "说唱音", "aliases": ["sprechstimme", "sprechgesang", "说唱音"] },
+        { "id": "overtone-singing", "name": "overtone singing", "display": "泛音唱法", "aliases": ["overtone singing", "throat singing", "泛音唱法", "呼麦"] },
+        { "id": "alveolar-trill", "name": "alveolar trill", "display": "齿龈颤音", "aliases": ["alveolar trill", "舌尖颤音", "大舌颤音", "弹舌", "齿龈颤音"] }
+      ]
+    },
+    {
+      "id": "general",
+      "name": "general articulation",
+      "display": "通用奏法",
+      "children": [
+        { "id": "legato-art", "name": "legato (articulation)", "display": "连奏", "aliases": ["legato articulation", "连奏", "连音"] },
+        { "id": "staccato", "name": "staccato", "display": "断奏", "aliases": ["staccato", "断奏", "跳音"] },
+        { "id": "roll", "name": "roll", "display": "滚奏", "aliases": ["roll", "滚奏"] }
+      ],
+      "note": "不绑定具体乐器族的奏法：连奏、断奏、滚奏。连弓（legato bowing）仍归弦乐组，两者不是一回事。"
+    }
+  ]
+}

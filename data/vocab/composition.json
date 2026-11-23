@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "dim": "composition",
+  "note": "作曲技法（composition）。四个根是「怎么写曲子」的四类手法：旋律、和声、对位、配器。注意与 instrument_technique（乐器演奏技法：运弓、花舌、弱音器……）区分——前者是乐谱上的选择，后者是演奏者手上的动作。同一 id 可以出现在多个根下（如 modulation），展平时会生成多条父子边，因为转调同时是旋律事件与和声事件。",
+  "roots": [
+    {
+      "id": "melodic",
+      "name": "melodic",
+      "display": "旋律技法",
+      "children": [
+        { "id": "modulation", "name": "modulation (tonality)", "display": "转调", "aliases": ["modulation", "转调", "modulation (tonality)"] },
+        { "id": "sequence", "name": "sequence", "display": "模进", "aliases": ["sequence", "模进"] },
+        { "id": "melodic-inversion", "name": "melodic inversion", "display": "旋律倒影", "aliases": ["melodic inversion", "倒影"] },
+        { "id": "retrograde", "name": "retrograde", "display": "逆行", "aliases": ["retrograde", "逆行"] },
+        { "id": "diminution", "name": "diminution", "display": "减值", "aliases": ["diminution", "减值"] },
+        { "id": "augmentation", "name": "augmentation", "display": "增值", "aliases": ["augmentation", "增值"] },
+        { "id": "ornamentation", "name": "ornamentation", "display": "装饰", "aliases": ["ornamentation", "装饰音"] }
+      ]
+    },
+    {
+      "id": "harmonic",
+      "name": "harmonic",
+      "display": "和声技法",
+      "children": [
+        { "id": "modulation", "name": "modulation (tonality)", "display": "转调", "aliases": ["modulation", "转调", "modulation (tonality)"] },
+        { "id": "tonicization", "name": "tonicization", "display": "主音化", "aliases": ["tonicization", "主功能化", "主音化", "副属和弦", "离调"] },
+        { "id": "pedal-point", "name": "pedal point", "display": "持续音", "aliases": ["pedal point", "pedal", "持续音"] },
+        { "id": "chromaticism", "name": "chromaticism", "display": "半音化", "aliases": ["chromaticism", "半音化"] },
+        { "id": "extended-chord", "name": "extended chord", "display": "延伸和弦", "aliases": ["extended chord", "延伸和弦", "九和弦"] },
+        { "id": "modal-mixture", "name": "modal mixture", "display": "调式交替", "aliases": ["modal mixture", "borrowed chord", "调式交替", "借用和弦"] },
+        { "id": "custom-1", "name": "new entry", "display": "非功能和声" }
+      ]
+    },
+    {
+      "id": "counterpoint",
+      "name": "counterpoint",
+      "display": "对位技法",
+      "children": [
+        { "id": "imitation", "name": "imitation", "display": "模仿", "aliases": ["imitation", "模仿"] },
+        { "id": "canon", "name": "canon", "display": "卡农", "aliases": ["canon", "卡农"] },
+        { "id": "octave-imitation", "name": "octave imitation", "display": "八度模仿", "aliases": ["octave imitation", "八度模仿"] },
+        { "id": "invertible-counterpoint", "name": "invertible counterpoint", "display": "可转位对位", "aliases": ["invertible counterpoint", "可转位对位"] }
+      ]
+    },
+    {
+      "id": "orchestration",
+      "name": "orchestration",
+      "display": "配器技法",
+      "children": [
+        { "id": "tutti", "name": "tutti", "display": "全奏", "aliases": ["tutti", "全奏"] },
+        { "id": "doubling", "name": "doubling", "display": "叠奏", "aliases": ["doubling", "叠奏", "同度叠加"] },
+        { "id": "divisi", "name": "divisi", "display": "分奏", "aliases": ["divisi", "分奏"] },
+        { "id": "coloristic-writing", "name": "coloristic writing", "display": "色彩性写法", "aliases": ["coloristic writing", "色彩性写法"] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# 在 GitHub 的机器上打三平台安装包 —— 包括本机做不出来的 macOS。
+#
+# 为什么需要它：dmg 依赖 macOS 的 hdiutil、苹果签名的 codesign，Windows / Linux
+# 都做不了（交叉编译没有被支持）。这里用 macOS runner 打，产出 zip / dmg 作为
+# workflow artifact 下载即可，不签名（首次打开要右键 → 打开）。
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+            artifact: miyako-windows
+          - os: macos-latest
+            script: dist:mac
+            artifact: miyako-macos
+          - os: ubuntu-latest
+            script: dist:linux
+            artifact: miyako-linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖（postinstall 会把 better-sqlite3 重建成 Electron ABI）
+        run: npm ci
+
+      - name: 纯函数单测
+        run: npm test
+
+      - name: 打包
+        env:
+          # 没有证书：跳过签名，打出来的包首次打开需要手动放行
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run ${{ matrix.script }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.AppImage
+          if-no-files-found: error

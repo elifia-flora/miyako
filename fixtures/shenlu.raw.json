@@ -1,0 +1,43 @@
+{
+	"id": null,
+	"uuid": null,
+	"title": {"original text": "神鹿谣", "original language": "Chinese"},
+	"basic": { 
+		"time signature": {
+			"value": "3/4", "type": "simple meter", 
+			"description": "听起来又有点像 6/4 或更慢的 6/8"
+        },
+		"tempo": {
+      "value": 107, "unit": "BPM (quarter note as a beat)", "term": null, "is_tempo_change": false
+    },
+		"description": "在瑶以往的云梦泽系列音乐中，我们都用了一些音高打击乐，比如马林巴、钢片琴，以及竖琴等去表现她森林系以及仙气的感觉。而这次遇见神鹿这个皮肤我们在音乐上希望去结合瑶本身的特质和敦煌的色彩。因此在配器上，我们在云梦泽的基础上引入了箜篌和五弦琵琶这两件敦煌壁画上出现次数最多的乐器，从音色上去结合敦煌的印象，而调式上则没有过多地限制在中国传统调式里，而是采用了自然小调，给瑶增添了一些异域的神秘感。在和声色彩上表达了一种从开始的静谧到后来的万物复苏这样逐渐明亮、配器上则是从静到动的感觉。同时在乐队部分，铜管的削弱给乐曲带来更加轻盈和飘逸的听感。"
+	},
+
+	"period:": "contemporary",
+	"composition techniques": {
+		"melodic techniques": ["modulation (tonality)"],
+		"harmonic techniques": ["modulation (tonality)"],
+		"counterpoint techniques": ["octave imitation", {"parent": ["imitation", "canon"]}],
+		"orchestration techniques": []
+	},
+
+	"Structure": [
+		{"section 1": "intro", "tonality": "c dorian", "start_position_musical": 2},
+		{"section 2": "A1", "tonality": "c natural minor", "start_position_musical": 12}, 
+    {"section 3": "Transition 1", "tonality": "c natural minor", "start_position_musical": 26},
+    {"section 4": "B1", "tonality": "c natural minor", "start_position_musical": 34},
+		{"section 5": "A2", "tonality": "g natural minor", "start_position_musical": 56},
+    {"section 6": "Transition 2", "tonality": "not sure, is f natural minor?", "start_position_musical": 70},
+    {"section 7": "B2", "tonality": "c-sharp natural minor", "start_position_musical": 78},
+    {"section 8": "A3", "tonality": "c-sharp natural minor", "start_position_musical": 96},
+    {"section 8": "coda", "tonality": "c-sharp natural minor", "start_position_musical": 106}
+	],
+
+    "instruments_used": [
+        "Pipa (5-Strings)", "Erhu", "Konghou", "Yangqin", "Dizi", 
+        "Horns", "",
+        "Vibraphone", "Celesta",
+        "Kalimba", "Mandolin", "Harp",
+        "Violins 1", "Violins 2", "Violas", "Violoncellos", "Contrabass" 
+    ]
+}

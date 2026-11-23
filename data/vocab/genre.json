@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "dim": "genre",
+  "note": "流派（genre）。与 period 分工：period 只收历史分期（中世纪…当代），爵士 / 民族 / 民谣 / 流行这类「写法与来源」属于流派。track.genre 存的是条目的 name（英文规范值，历史档案里就是 'Jazz' / 'Folk' 这些写法），display 是中文显示，aliases 进搜索与补全。根节点本身也是可选流派，子节点是更细的子类。2026-11-04：古典根下的交响曲 / 协奏曲 / 弦乐四重奏 / 室内乐 / 练习曲 / 号角曲移入 composition_type.json（那是体裁，不是流派）；打击乐仍留在本表，因为它说的是编制而不是形制。",
+  "roots": [
+    {
+      "id": "classical",
+      "name": "Classical",
+      "display": "古典",
+      "aliases": ["classical music", "古典音乐", "严肃音乐"],
+      "children": [
+        { "id": "percussion-music", "name": "Percussion", "display": "打击乐", "aliases": ["percussion music", "打击乐作品"] }
+      ]
+    },
+    {
+      "id": "jazz",
+      "name": "Jazz",
+      "display": "爵士",
+      "aliases": ["jazz music", "爵士乐"],
+      "children": [
+        { "id": "swing", "name": "Swing", "display": "摇摆乐", "aliases": ["swing", "摇摆"] },
+        { "id": "bebop", "name": "Bebop", "display": "比波普", "aliases": ["bop", "比波普"] },
+        { "id": "fusion", "name": "Fusion", "display": "融合爵士", "aliases": ["jazz fusion", "融合爵士"] },
+        { "id": "latin-jazz", "name": "Latin Jazz", "display": "拉丁爵士", "aliases": ["latin jazz", "拉丁爵士"] }
+      ]
+    },
+    {
+      "id": "folk",
+      "name": "Folk",
+      "display": "民族 / 民谣",
+      "aliases": ["folk music", "traditional", "民族", "民谣", "传统音乐"],
+      "children": [
+        { "id": "ballad", "name": "Ballad", "display": "叙事歌", "aliases": ["ballad", "叙事歌", "谣曲"] },
+        { "id": "chinese-traditional", "name": "Chinese Traditional", "display": "中国民族", "aliases": ["chinese folk", "民乐", "国乐"] },
+        { "id": "celtic", "name": "Celtic", "display": "凯尔特", "aliases": ["celtic music", "凯尔特音乐"] }
+      ]
+    },
+    {
+      "id": "pop",
+      "name": "Pop",
+      "display": "流行",
+      "aliases": ["pop music", "流行音乐", "通俗音乐"],
+      "children": [
+        { "id": "city-pop", "name": "City Pop", "display": "城市流行", "aliases": ["citypop", "城市流行"] },
+        { "id": "synthpop", "name": "Synthpop", "display": "合成器流行", "aliases": ["synth pop", "合成器流行"] },
+        { "id": "ballad-pop", "name": "Pop Ballad", "display": "流行抒情", "aliases": ["pop ballad", "抒情流行"] }
+      ]
+    },
+    {
+      "id": "rock",
+      "name": "Rock",
+      "display": "摇滚",
+      "aliases": ["rock music", "摇滚乐"],
+      "children": [
+        { "id": "alternative", "name": "Alternative Rock", "display": "另类摇滚", "aliases": ["alternative", "另类"] },
+        { "id": "post-rock", "name": "Post-rock", "display": "后摇", "aliases": ["post rock", "后摇滚"] },
+        { "id": "metal", "name": "Metal", "display": "金属", "aliases": ["heavy metal", "重金属"] }
+      ]
+    },
+    {
+      "id": "electronic",
+      "name": "Electronic",
+      "display": "电子",
+      "aliases": ["electronic music", "电子音乐", "电音"],
+      "children": [
+        { "id": "ambient", "name": "Ambient", "display": "氛围", "aliases": ["ambient music", "氛围音乐"] },
+        { "id": "techno", "name": "Techno", "display": "科技舞曲", "aliases": ["techno", "铁克诺"] },
+        { "id": "edm", "name": "EDM", "display": "电子舞曲", "aliases": ["dance", "电子舞曲"] }
+      ]
+    },
+    {
+      "id": "ost",
+      "name": "OST",
+      "display": "配乐 / 原声带",
+      "aliases": ["soundtrack", "original soundtrack", "原声", "配乐", "影视配乐"],
+      "children": [
+        { "id": "film-score", "name": "Film Score", "display": "电影配乐", "aliases": ["film score", "电影配乐"] },
+        { "id": "anime-score", "name": "Anime Score", "display": "动画配乐", "aliases": ["anime score", "动画配乐", "番剧配乐"] },
+        { "id": "game-score", "name": "Game Score", "display": "游戏配乐", "aliases": ["game score", "游戏配乐"] }
+      ]
+    },
+    {
+      "id": "vocal",
+      "name": "Vocal",
+      "display": "声乐",
+      "aliases": ["vocal music", "声乐作品", "人声"],
+      "children": [
+        { "id": "art-song", "name": "Art Song", "display": "艺术歌曲", "aliases": ["lied", "艺术歌曲"] },
+        { "id": "choral", "name": "Choral", "display": "合唱", "aliases": ["choir", "合唱作品"] },
+        { "id": "aria", "name": "Aria", "display": "咏叹调", "aliases": ["aria", "咏叹调"] }
+      ]
+    }
+  ]
+}
