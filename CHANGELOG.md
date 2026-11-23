@@ -17,8 +17,8 @@
 ### 修复
 - 「编辑」菜单的撤销 / 重做 / 全局撤销 / 全局重做**一直是灰的**：菜单里读的是 `histMenu.undo`
   （Ref 本身）而不是 `histMenu.value.undo`，永远是 `undefined`。快捷键不受影响，只是菜单点不了。
-- macOS / Linux 安装包里没有能用的 better-sqlite3 原生模块（预编译包被全局排除、`build/` 也被排除），
-  现在每个平台只带自己那一份预编译包。
+- 0.99.0 的打包配置把 macOS / Linux 的 better-sqlite3 预编译包和 `build/` 都排除了，这两个平台的安装包里
+  应该没有能加载的数据库模块（按配置推断，没有在 macOS 上实测）。现在每个平台只带自己那一份预编译包。
 
 ### 安全
 - 所有窗口的渲染进程开启沙箱（`sandbox: true`），七份重复的 webPreferences 合成一个 `securePrefs()`。
@@ -27,7 +27,8 @@
 - 新窗口 / 页面跳转统一拦截（规则在 `src/main/nav-policy.js`，有单测）：只有 http(s) 与网易云（`orpheus:`）
   会交给系统打开；`file:`、`javascript:`、自定义协议一律不开；渲染层不能跳出应用自己的页面
   （包括把文件拖进窗口时 Chromium 默认的「导航到这个文件」）。
-  网易云「唤起客户端播放」走的是 IPC（`netease:open`），本来就不经过这两条拦截，已在 Electron 里实测仍能正常唤起。
+  网易云「唤起客户端播放」走的是 IPC（`netease:open`），本来就不经过这两条拦截。已在 Electron 里实测：
+  点详情里的 ▶ 和「网易云 · 打开」，交给系统的 `orpheus://` 地址与 0.99.0 完全一致（客户端本身是否被唤起需在装了网易云的电脑上确认）。
 - `vocab:open-file` / `vocab:doc` / `vocab:save` 校验维度名，挡住 `../` 越出 `data/vocab/` 的路径。
 
 ### 安装包
