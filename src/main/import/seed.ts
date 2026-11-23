@@ -8,6 +8,7 @@ import type { VocabSet } from '../vocab/load';
 import { setAudioPath } from '../ipc/audio';
 import { parsedFor } from '../ipc/analysis';
 import { analysisIdFor, newTrackId } from '../db/ids';
+import { writeFileAtomic } from '../atomic-write.js';
 
 export interface SeedResult {
   imported: string[];
@@ -25,7 +26,7 @@ export interface SeedResult {
  */
 function stampUuid(dir: string, file: string, doc: any, uuid: string) {
   const next = { ...doc, uuid };
-  fs.writeFileSync(path.join(dir, file), JSON.stringify(next, null, 2) + '\n', 'utf8');
+  writeFileAtomic(path.join(dir, file), JSON.stringify(next, null, 2) + '\n');
 }
 
 

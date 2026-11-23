@@ -23,6 +23,7 @@ import path from 'node:path';
 import { dialog } from 'electron';
 import { parseLrc, serializeLrc } from '../../shared/lrc.js';
 import { mt } from '../locale';
+import { writeFileAtomic } from '../atomic-write.js';
 
 export type CoverKind = 'single' | 'album';
 export const COVER_KINDS: CoverKind[] = ['single', 'album'];
@@ -465,7 +466,7 @@ export function saveLyricLine(
 
   const text = serializeLrc(lines, doc.meta);
   try {
-    fs.writeFileSync(doc.path, text, 'utf8');
+    writeFileAtomic(doc.path, text);
   } catch (e) {
     console.error('[lyrics] 写回失败', doc.path, e);
     return { code: 'nodoc' };

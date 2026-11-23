@@ -3,6 +3,7 @@ import path from 'node:path';
 import type Database from 'better-sqlite3';
 import { trackFileCandidates } from '../../shared/trackfile.js';
 import { normalizeLang } from '../../shared/lang.js';
+import { writeFileAtomic } from '../atomic-write.js';
 
 /**
  * 曲目 JSON 的**写回器**（数据库 → `data/tracks/*.json`）。
@@ -346,14 +347,14 @@ export function writeTrackJson(ctx: JsonCtx, trackId: string): WriteResult | nul
        * 搬不动（被别的程序占着 / 跨卷）：退回原文件名继续写。
        * 文件名叫什么不影响数据正确性 —— JSON 里的 `title` 才是权威。
        */
-      fs.writeFileSync(path.join(dir, current), stringifyTrackDoc(doc), 'utf8');
+      writeFileAtomic(path.join(dir, current), stringifyTrackDoc(doc));
       idx.byId.set(trackId, current);
       idx.byFile.set(current, trackId);
       return { file: current, created: false };
     }
   }
 
-  fs.writeFileSync(path.join(dir, name), stringifyTrackDoc(doc), 'utf8');
+  writeFileAtomic(path.join(dir, name), stringifyTrackDoc(doc));
   idx.byId.set(trackId, name);
   idx.byFile.set(name, trackId);
   return { file: name, created };
@@ -412,7 +413,7 @@ export function archiveTrackJson(ctx: JsonCtx, trackId: string): string | null {
   if (fs.existsSync(path.join(outDir, outName))) {
     outName = current.replace(/\.json$/, ` (${Date.now().toString(36)}).json`);
   }
-  fs.writeFileSync(path.join(outDir, outName), stringifyTrackDoc(stamped), 'utf8');
+  writeFileAtomic(path.join(outDir, outName), stringifyTrackDoc(stamped));
   fs.unlinkSync(src);
 
   idx.byId.delete(trackId);

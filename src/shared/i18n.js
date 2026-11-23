@@ -2496,6 +2496,10 @@ const EN = {
 
 export const DICT = { zh: ZH, 'zh-TW': ZH_TW, 'zh-HK': ZH_HK, en: EN, ja: JA };
 
+/**
+ * @param {unknown} v
+ * @returns {v is string}
+ */
 export function isLocale(v) {
   return Object.prototype.hasOwnProperty.call(DICT, v);
 }

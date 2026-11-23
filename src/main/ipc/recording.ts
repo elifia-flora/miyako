@@ -4,6 +4,9 @@ import { dialog } from 'electron';
 import { probeAudioInfo } from '../../shared/audiofile.js';
 import { mt } from '../locale';
 import { AUDIO_EXT, fileSizeOf, readHead, resolveAudio, type Ctx } from './audio';
+
+/** 只查库、不碰文件的函数只需要 db：分析 / 曲目模块手上只有 `{ db }` */
+type DbCtx = Pick<Ctx, 'db'>;
 import { newId as makeId } from '../db/ids';
 
 /**
@@ -212,7 +215,7 @@ const SEL = `SELECT * FROM recording WHERE track_id = ? AND deleted_at IS NULL O
  * 顺序仍然是播放优先级：`seq_order` 只在同一层内比较，音质文件不参与
  * 「点作品先播哪一版」的排序 —— 它们不是独立的版本，只是同一个版本的不同文件。
  */
-export function listRecordings({ db }: Ctx, trackId: string): Recording[] {
+export function listRecordings({ db }: DbCtx, trackId: string): Recording[] {
   const rows = db.prepare(SEL).all(trackId) as any[];
   const exists = (p: string) => {
     try {
@@ -239,7 +242,7 @@ export function recordingHasFile(r: Recording): boolean {
   return r.fileExists || r.variants.some((v) => v.fileExists);
 }
 
-export function getRecording({ db }: Ctx, id: string): Recording | null {
+export function getRecording({ db }: DbCtx, id: string): Recording | null {
   const r = db.prepare(`SELECT * FROM recording WHERE id = ? AND deleted_at IS NULL`).get(id) as any;
   if (!r) return null;
   return rowToRecording(r, (p) => {
@@ -256,7 +259,7 @@ export function getRecording({ db }: Ctx, id: string): Recording | null {
  * 第一首要是还没绑文件（「先登记信息、音频后补」很常见），兜到第一个有文件的，
  * 免得整部作品明明有别的版本能播、却被判成「没有音频」。
  */
-export function defaultRecording(ctx: Ctx, trackId: string): Recording | null {
+export function defaultRecording(ctx: DbCtx, trackId: string): Recording | null {
   const all = listRecordings(ctx, trackId);
   if (!all.length) return null;
   return all.find((r) => recordingHasFile(r)) ?? all[0];
@@ -652,7 +655,7 @@ export function ensureRecordingForTrack(ctx: Ctx, trackId: string): Recording | 
  * 某作品「当前生效」的原点偏移 = 主录音（顺序里的第一首）那一份。
  * 一个录音版本都没有时返回 null，调用方退回 analysis.audio_offset_ms。
  */
-export function primaryOffset(ctx: Ctx, trackId: string): number | null {
+export function primaryOffset(ctx: DbCtx, trackId: string): number | null {
   const rec = defaultRecording(ctx, trackId);
   return rec ? rec.audioOffsetMs : null;
 }
@@ -667,7 +670,7 @@ export function primaryOffset(ctx: Ctx, trackId: string): number | null {
  * 等它生成第一条录音时 ensureRecordingForTrack 会把它抄过去。
  */
 export function setRecordingOffset(
-  ctx: Ctx,
+  ctx: DbCtx,
   trackId: string,
   recId: string | null,
   ms: number

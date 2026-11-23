@@ -3,6 +3,7 @@ import path from 'node:path';
 import type Database from 'better-sqlite3';
 import { readTranslations, type VocabSet } from '../vocab/load';
 import { stringifyVocab } from '../vocab/write';
+import { writeFileAtomic } from '../atomic-write.js';
 
 /**
  * 词表编辑器的主进程一侧。
@@ -48,7 +49,16 @@ interface Ctx {
 const ID_RE = /^[a-z0-9][a-z0-9._-]{0,59}$/;
 const MAX_DEPTH = 4;
 
-function docPath(dataDir: string, dim: string) {
+/** 维度名只能是普通的文件名片段：挡住 `../tracks/xxx` 这类越出 vocab/ 目录的路径 */
+const DIM_RE = /^[a-z][a-z0-9_-]{0,59}$/i;
+
+export function isVocabDim(dim: unknown): dim is string {
+  return typeof dim === 'string' && DIM_RE.test(dim);
+}
+
+/** 不合法的维度名返回空串：调用方的 `existsSync('')` 为 false，自然走「未知维度」分支 */
+export function docPath(dataDir: string, dim: string) {
+  if (!isVocabDim(dim)) return '';
   return path.join(dataDir, 'vocab', `${dim}.json`);
 }
 
@@ -199,7 +209,7 @@ export function saveDoc({ db, vocab, dataDir }: Ctx, dim: string, roots: unknown
   raw.dim ??= dim;
   raw.roots = next;
   try {
-    fs.writeFileSync(file, stringifyVocab(raw), 'utf8');
+    writeFileAtomic(file, stringifyVocab(raw));
   } catch (err: any) {
     return { ok: false, code: 'io', detail: String(err?.message ?? err) };
   }

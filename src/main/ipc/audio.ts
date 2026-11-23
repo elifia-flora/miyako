@@ -16,6 +16,8 @@ export interface AudioInfo {
   /** 渲染层直接喂给 <audio> / fetch 的自定义协议地址 */
   url: string;
   size: number;
+  /** 文件修改时间（毫秒），波形缓存键要带上它（与 shared/types.ts 的 AudioInfo 一致） */
+  mtimeMs: number;
   format: string | null;
   sampleRate: number;
   channels: number;

@@ -17,19 +17,26 @@ files:
   - assets/**/*
   # 显式写了 files 之后，electron-builder 会把**整个** node_modules 塞进 asar
   # （连 electron-builder 自己都在里面）—— 安装包因此有 89MB 的 asar。
-  # 这里反过来：先全排除，再只放回运行期真正要用的几个。
+  # 这里反过来：先全排除，再只放回运行期真正要 require 的那一个。
+  #
+  # 主进程打包产物里只有 require("better-sqlite3")（其余全是 node: 内置模块与 electron）：
+  # - vue 已经被 Vite 打进 out/renderer 的 bundle，node_modules/vue 运行时没人读；
+  # - node-addon-api 只是编译原生模块时用的 C++ 头文件；
+  # - better-sqlite3 的 deps/（sqlite3.c 源码，约 10MB）、src/（C++ 源码）同样只在编译时用。
   - '!node_modules/**/*'
-  - 'node_modules/better-sqlite3/**/*'
-  - 'node_modules/node-addon-api/**/*'
-  - 'node_modules/vue/**/*'
+  - 'node_modules/better-sqlite3/package.json'
+  - 'node_modules/better-sqlite3/LICENSE'
+  - 'node_modules/better-sqlite3/lib/**/*'
+  - 'node_modules/better-sqlite3/prebuilds/**/*'
   - '!**/*.map'
+  # 冒烟测试（src/main/smoke.ts）单独成 chunk，只在 --smoke 下加载，安装包里不带
+  - '!out/main/smoke-*.js'
   # assets/ 里混着本机的母带与歌词（gitignore 只挡 git，挡不住打包）：一律不带。
   - '!assets/**/*.{flac,wav,mp3,m4a,ogg,lrc}'
   # 专辑封面是他人作品（没有版权），仓库里不带，打包也不带
   - '!assets/*封面*.jpg'
-  # better-sqlite3 的预编译包给了七个平台，只留本机这个；build/ 是编译中间物。
-  - '!node_modules/better-sqlite3/prebuilds/darwin-*'
-  - '!node_modules/better-sqlite3/prebuilds/linux*'
+  # better-sqlite3 的预编译包按「系统-架构」给了八份，每个平台只留自己那份
+  # （${os} = win / mac / linux，${arch} = x64 / arm64）；build/ 是编译中间物。
   - '!node_modules/better-sqlite3/build/**'
 
 extraResources:
@@ -45,6 +52,9 @@ extraResources:
       - '**/*.json'
       - '!.archive/**'
 
+# Chromium 自带 55 种界面语言包（约 49MB），这里只留应用本身支持的语言
+electronLanguages: [zh-CN, zh-TW, ja, en-US]
+
 asar: true
 asarUnpack:
   - '**/*.node'
@@ -53,6 +63,10 @@ asarUnpack:
 npmRebuild: false
 
 win:
+  # 只带 Windows x64 的 better-sqlite3 预编译包
+  files:
+    - '!node_modules/better-sqlite3/prebuilds/{darwin,linux,linuxmusl}-*'
+    - '!node_modules/better-sqlite3/prebuilds/win32-arm64.node'
   target:
     - target: nsis
       arch: [x64]
@@ -74,11 +88,18 @@ portable:
 
 # macOS 只能在 macOS（或 CI 的 macOS runner）上打：dmg 依赖 hdiutil、签名依赖 codesign。
 mac:
+  # 只带 macOS 的预编译包。0.99.0 在全局把 darwin-* 排除掉了，build/ 也排除了 ——
+  # mac 包里根本没有能加载的 better_sqlite3.node，启动即打不开数据库。
+  files:
+    - '!node_modules/better-sqlite3/prebuilds/{win32,linux,linuxmusl}-*'
   target: [dmg, zip]
   category: public.app-category.music
   artifactName: ${productName}-${version}-${arch}.${ext}
 
 linux:
+  # 同上：只带 Linux（glibc）的预编译包；0.99.0 的 Linux 包同样缺这一份
+  files:
+    - '!node_modules/better-sqlite3/prebuilds/{win32,darwin,linuxmusl}-*'
   target: [AppImage]
   category: Audio
   artifactName: ${productName}-${version}-${arch}.${ext}

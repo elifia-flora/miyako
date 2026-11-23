@@ -39,12 +39,12 @@ const isHost = !/^#?(grid|lyrics|overlay|image)/.test(location.hash || '');
 export const audioHost = isHost;
 
 export const state = reactive({
-  trackId: null,
+  trackId: /** @type {string | null} */ (null),
   /**
    * 当前在播的录音版本 id（null = 作品的主录音，也就是顺序里的第一首）。
    * 双击某个演奏版本试听时会临时变成那条的 id —— **不改顺序、不写库**。
    */
-  recId: null,
+  recId: /** @type {string | null} */ (null),
   /**
    * 'audio' = 本地音频在播；'timeline' = 没有可播音频，只有一条独立走的时间线；
    * 'none' = 还没加载。时间线模式**不会发声、也不与网易云同步**，只负责让播放头可对轨。
@@ -52,7 +52,7 @@ export const state = reactive({
   sourceMode: 'none',
   /** 时间线总长被手动改过：重拉同一首时不要再用档案推算值盖掉它 */
   timelineDurationManual: false,
-  info: null,
+  info: /** @type {import('../../../shared/types').AudioInfo | null} */ (null),
   loading: false,
   ready: false,
   decoding: false,
@@ -61,7 +61,7 @@ export const state = reactive({
    * 错误可能停留在界面上很久，中途切了语言也要跟着变，
    * 而且这里不该知道当前是什么语言。真正拼文本的是显示它的组件。
    */
-  error: null,
+  error: /** @type {{ key: string; vars?: Record<string, unknown> } | null} */ (null),
   /** 音频总长（毫秒）。优先用文件头探测值，解码后用解码结果校正 */
   durationMs: 0,
   /**
@@ -84,7 +84,7 @@ export const state = reactive({
    * 这样"拉满就是 0dB"是字面成立的最大值，而不是某个需要校准的参考点。
    */
   gain: 1,
-  peaks: null,
+  peaks: /** @type {ReturnType<typeof import('./peaks.js').createPeaks> | null} */ (null),
   /**
    * 「回到开头」的次数。纯计数器，不存位置：
    * 播放头归零可能是 Home、也可能是拖到 0，但只有显式按 Home/■ 才需要
@@ -292,7 +292,10 @@ function stopLoop() {
   raf = 0;
 }
 
-/** 每帧回调（毫秒）。返回取消订阅函数 */
+/**
+ * 每帧回调（毫秒）。返回取消订阅函数
+ * @param {(ms: number) => void} fn
+ */
 export function onFrame(fn) {
   frameFns.add(fn);
   return () => frameFns.delete(fn);
@@ -372,6 +375,11 @@ export function syncTimelineDuration(ms) {
  * `opts.force`：录音版本 / 音质文件刚被改过时要强制重解析。同 id 早退的前提是
  * 「解析结果还没过期」—— 换文件之后这个前提不成立，继续拿旧 info 会让 `<audio>`
  * 带着旧文件的字节范围去请求新文件，表现就是偶发「播放失败」、拖一下播放头又好了。
+ */
+/**
+ * @param {string | null | undefined} trackId
+ * @param {string | null} [recId]
+ * @param {{ force?: boolean; timelineMs?: number }} [opts]
  */
 export async function loadTrack(trackId, recId = null, opts = {}) {
   if (!trackId) return;

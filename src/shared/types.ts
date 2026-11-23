@@ -133,6 +133,10 @@ export interface AudioInfo {
   channels: number;
   bits: number;
   durationMs: number;
+  /** 解码后开头多出的采样数（编码器预热，按文件采样率计）；见 shared/audiofile.js 的 codecLeadSamples */
+  leadSamples: number;
+  /** wav 且头里有 bext 块（Broadcast Wave） */
+  bwf: boolean;
   source: 'db' | 'folder' | 'none';
 }
 
@@ -304,6 +308,8 @@ export interface RecordingPatch {
 }
 
 export interface TrackDetail extends TrackRow {
+  /** track.notes 列（全文搜索也索引它）；详情页目前不显示，但 getTrack 一直在返回 */
+  notes: string | null;
   description: string | null;
   /** 曲式（奏鸣曲式 / 回旋曲式…），整曲一条抽象结论，不做逐段标注 */
   form: string | null;
