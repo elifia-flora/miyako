@@ -27,7 +27,11 @@ files:
   - 'node_modules/better-sqlite3/package.json'
   - 'node_modules/better-sqlite3/LICENSE'
   - 'node_modules/better-sqlite3/lib/**/*'
-  - 'node_modules/better-sqlite3/prebuilds/**/*'
+  # 预编译包按「系统-架构」给了八份，只带正在打的那个平台的一份。
+  # ${platform} = win32 / darwin / linux，${arch} = x64 / arm64，正好对上 prebuilds/ 里的文件名。
+  # 注意：不要在 win: / mac: / linux: 下面另写 files —— 平台级 files 会从「全部文件」重新起算，
+  # 0.99.1 的第一次构建就因此把 src/、tools/ 和冒烟代码一起打进了安装包。
+  - 'node_modules/better-sqlite3/prebuilds/${platform}-${arch}.node'
   - '!**/*.map'
   # 冒烟测试（src/main/smoke.ts）单独成 chunk，只在 --smoke 下加载，安装包里不带
   - '!out/main/smoke-*.js'
@@ -35,8 +39,7 @@ files:
   - '!assets/**/*.{flac,wav,mp3,m4a,ogg,lrc}'
   # 专辑封面是他人作品（没有版权），仓库里不带，打包也不带
   - '!assets/*封面*.jpg'
-  # better-sqlite3 的预编译包按「系统-架构」给了八份，每个平台只留自己那份
-  # （${os} = win / mac / linux，${arch} = x64 / arm64）；build/ 是编译中间物。
+  # better-sqlite3 的 build/ 是编译中间物
   - '!node_modules/better-sqlite3/build/**'
 
 extraResources:
@@ -63,10 +66,6 @@ asarUnpack:
 npmRebuild: false
 
 win:
-  # 只带 Windows x64 的 better-sqlite3 预编译包
-  files:
-    - '!node_modules/better-sqlite3/prebuilds/{darwin,linux,linuxmusl}-*'
-    - '!node_modules/better-sqlite3/prebuilds/win32-arm64.node'
   target:
     - target: nsis
       arch: [x64]
@@ -88,18 +87,11 @@ portable:
 
 # macOS 只能在 macOS（或 CI 的 macOS runner）上打：dmg 依赖 hdiutil、签名依赖 codesign。
 mac:
-  # 只带 macOS 的预编译包。0.99.0 在全局把 darwin-* 排除掉了，build/ 也排除了 ——
-  # mac 包里根本没有能加载的 better_sqlite3.node，启动即打不开数据库。
-  files:
-    - '!node_modules/better-sqlite3/prebuilds/{win32,linux,linuxmusl}-*'
   target: [dmg, zip]
   category: public.app-category.music
   artifactName: ${productName}-${version}-${arch}.${ext}
 
 linux:
-  # 同上：只带 Linux（glibc）的预编译包；0.99.0 的 Linux 包同样缺这一份
-  files:
-    - '!node_modules/better-sqlite3/prebuilds/{win32,darwin,linuxmusl}-*'
   target: [AppImage]
   category: Audio
   artifactName: ${productName}-${version}-${arch}.${ext}
