@@ -16,9 +16,9 @@
   ],
   "main": "out/main/index.js",
   "scripts": {
-    "dev": "electron-vite dev",
+    "dev": "node tools/dev.mjs",
     "build": "electron-vite build",
-    "start": "electron-vite preview",
+    "start": "node tools/dev.mjs preview",
     "app": "node tools/launch.mjs",
     "app:debug": "node tools/launch.mjs --debug",
     "check": "node tools/validate.mjs",

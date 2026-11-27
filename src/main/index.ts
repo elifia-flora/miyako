@@ -90,6 +90,18 @@ protocol.registerSchemesAsPrivileged([
  * 真要自定义 AUMID，得同时改 start.py 让 .lnk 带上同名 System.AppUserModel.ID。
  */
 
+/**
+ * 开发模式沿用改名前的用户目录。
+ *
+ * `package.json` 里有 `productName: miyako`（打包后的 exe / 安装目录都叫这个），
+ * 而 Electron 用 productName 决定 userData —— 于是 dev 会从 `%APPDATA%\music-atlas`
+ * 换到 `%APPDATA%\miyako`，看起来像「曲库空了、设置没了」。这里只把**未打包**的情况
+ * 按回老目录，打包版仍然是 miyako（升级不会互相打架）。
+ */
+if (!app.isPackaged) {
+  app.setPath('userData', path.join(app.getPath('appData'), 'music-atlas'));
+}
+
 let win: BrowserWindow | null = null;
 /** 歌词播报器（普通听众的窗口）与桌面歌词浮窗 */
 let lyricsWin: BrowserWindow | null = null;
