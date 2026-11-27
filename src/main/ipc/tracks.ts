@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Marker, MarkerKind, MovementRow, RecordingSummary, TrackDetail, TrackPatch, TrackQuery, TrackRow } from '../../shared/types';
 import { formatMs } from '../../shared/barbeat.js';
-import { expandQuery, splitTerms } from '../../shared/search.js';
+import { expandQuery, splitTerms, TIMELINE_NOTE_LANE_SQL } from '../../shared/search.js';
 import { searchTermTables } from '../vocab/terms';
 import { coversOf } from './media';
 import { setMarkers } from './analysis';
@@ -177,6 +177,25 @@ export function listTracks({ db, dataDir }: ListCtx, q: TrackQuery = {}): TrackR
         `EXISTS (SELECT 1 FROM json_tree(t.extra) jt
                   WHERE jt.type = 'text' AND jt.value LIKE @like${i})`
       );
+      /**
+       * 时间线面板的「备注」行（lane = note / *-note）。
+       * 存在 analysis_event 里，不在 track 表上，所以曲名那几列的 LIKE 够不着。
+       * 乐章是子曲目：备注写在乐章时间线上时，命中算到母作品（列表只列母作品）。
+       * 低音行不在这里 —— 见 isTimelineNoteLane。取消勾选时整段不加入。
+       */
+      if (q.includeTimelineNotes !== false) {
+        clauses.push(
+          `EXISTS (
+             SELECT 1
+               FROM track owner
+               JOIN analysis a ON a.track_id = owner.id AND a.deleted_at IS NULL
+               JOIN analysis_event e ON e.analysis_id = a.id
+              WHERE owner.deleted_at IS NULL
+                AND (owner.id = t.id OR owner.parent_id = t.id)
+                AND ${TIMELINE_NOTE_LANE_SQL}
+                AND IFNULL(e.text, '') LIKE @like${i})`
+        );
+      }
 
       // 西文长词走 FTS（中文两字词 LIKE 才是正解，所以两条并存取并集）
       if (term.length >= 3) {
