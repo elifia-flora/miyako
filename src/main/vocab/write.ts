@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeFileAtomic } from '../atomic-write.js';
 
 /**
  * 词表写回：固定 key 顺序 + 2 空格缩进 + UTF-8 无 BOM，
@@ -91,5 +92,5 @@ export function appendVocabTag(dataDir: string, dim: string, tag: { id: string; 
   custom.children ??= [];
   if (!custom.children.some((c: any) => c.id === tag.id)) custom.children.push(node);
 
-  fs.writeFileSync(file, stringifyVocab(doc), 'utf8');
+  writeFileAtomic(file, stringifyVocab(doc));
 }

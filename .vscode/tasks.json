@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "type": "npm",
+      "script": "app",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "type": "npm",
+      "script": "app:debug",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "close": false,
+        "showReuseMessage": false
+      }
+    }
+  ]
+}

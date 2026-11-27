@@ -82,7 +82,7 @@ function compositionTerms(dataDir: string): MovementTerm[] {
 
 export function loadMovementTerms(dataDir: string): MovementTermDoc {
   const raw = readJson(tempoMarkingPath(dataDir));
-  const tempoTerms = (Array.isArray(raw?.terms) ? raw.terms : [])
+  const tempoTerms = ((Array.isArray(raw?.terms) ? raw.terms : []) as unknown[])
     .map(cleanTerm)
     .filter((t): t is MovementTerm => !!t);
   return {

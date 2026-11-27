@@ -17,19 +17,29 @@ files:
   - assets/**/*
   # 显式写了 files 之后，electron-builder 会把**整个** node_modules 塞进 asar
   # （连 electron-builder 自己都在里面）—— 安装包因此有 89MB 的 asar。
-  # 这里反过来：先全排除，再只放回运行期真正要用的几个。
+  # 这里反过来：先全排除，再只放回运行期真正要 require 的那一个。
+  #
+  # 主进程打包产物里只有 require("better-sqlite3")（其余全是 node: 内置模块与 electron）：
+  # - vue 已经被 Vite 打进 out/renderer 的 bundle，node_modules/vue 运行时没人读；
+  # - node-addon-api 只是编译原生模块时用的 C++ 头文件；
+  # - better-sqlite3 的 deps/（sqlite3.c 源码，约 10MB）、src/（C++ 源码）同样只在编译时用。
   - '!node_modules/**/*'
-  - 'node_modules/better-sqlite3/**/*'
-  - 'node_modules/node-addon-api/**/*'
-  - 'node_modules/vue/**/*'
+  - 'node_modules/better-sqlite3/package.json'
+  - 'node_modules/better-sqlite3/LICENSE'
+  - 'node_modules/better-sqlite3/lib/**/*'
+  # 预编译包按「系统-架构」给了八份，只带正在打的那个平台的一份。
+  # ${platform} = win32 / darwin / linux，${arch} = x64 / arm64，正好对上 prebuilds/ 里的文件名。
+  # 注意：不要在 win: / mac: / linux: 下面另写 files —— 平台级 files 会从「全部文件」重新起算，
+  # 0.99.1 的第一次构建就因此把 src/、tools/ 和冒烟代码一起打进了安装包。
+  - 'node_modules/better-sqlite3/prebuilds/${platform}-${arch}.node'
   - '!**/*.map'
+  # 冒烟测试（src/main/smoke.ts）单独成 chunk，只在 --smoke 下加载，安装包里不带
+  - '!out/main/smoke-*.js'
   # assets/ 里混着本机的母带与歌词（gitignore 只挡 git，挡不住打包）：一律不带。
   - '!assets/**/*.{flac,wav,mp3,m4a,ogg,lrc}'
   # 专辑封面是他人作品（没有版权），仓库里不带，打包也不带
   - '!assets/*封面*.jpg'
-  # better-sqlite3 的预编译包给了七个平台，只留本机这个；build/ 是编译中间物。
-  - '!node_modules/better-sqlite3/prebuilds/darwin-*'
-  - '!node_modules/better-sqlite3/prebuilds/linux*'
+  # better-sqlite3 的 build/ 是编译中间物
   - '!node_modules/better-sqlite3/build/**'
 
 extraResources:
@@ -44,6 +54,9 @@ extraResources:
     filter:
       - '**/*.json'
       - '!.archive/**'
+
+# Chromium 自带 55 种界面语言包（约 49MB），这里只留应用本身支持的语言
+electronLanguages: [zh-CN, zh-TW, ja, en-US]
 
 asar: true
 asarUnpack:

@@ -462,7 +462,7 @@ function recHint(r: any): string {
 const draft = ref('');
 /** 输入框里的光标位置：变量补全要按光标前的那个词来匹配，而不是整条标题 */
 const draftCaret = ref(0);
-let inputEl: HTMLInputElement | null = null;
+let inputEl: HTMLInputElement | null = null as HTMLInputElement | null;
 /** Esc 取消后 blur 还会来一次，别让它把空输入又提交一遍 */
 let cancelling = false;
 

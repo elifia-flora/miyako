@@ -615,7 +615,7 @@ const totalWidth = computed(() => totalBars.value * pxPerBar.value);
  * （用户要求：低音 / 备注不能比级数矮）。将来若某套方案要强调主行，改回不同值即可，比例逻辑还在。
  * 面板够高时下方留空白（canvas 照常铺底色），而不是把每条泳道拉成柱子。
  */
-const lanesGeom = computed(() => {
+const lanesGeom = computed<{ lane: any; y: number; h: number }[]>(() => {
   const list = lanes.value;
   if (!list.length) return [] as { lane: any; y: number; h: number }[];
   const base = list.map((l: any) => (Number(l.height) > 0 ? Number(l.height) : LANE_ROW_MAX));
@@ -2547,10 +2547,10 @@ function onHostPointer(ev: PointerEvent) {
       onPointerUp(ev);
       break;
     case 'pointercancel':
-      onPointerCancel(ev);
+      onPointerCancel();
       break;
     default:
-      onPointerLeave(ev);
+      onPointerLeave();
   }
 }
 
@@ -2884,7 +2884,7 @@ function startMoveDrag(hit: any, copy = false) {
   };
 }
 
-function updateMoveDrag(x: number, y: number, d: { clientX: number; tick0: number }) {
+function updateMoveDrag(x: number, y: number, d: { clientX: number; tick0: number; tickExact: number }) {
   const m = moveDrag;
   if (!m) return;
   // 位移量用「连续 tick」算，再吸附到格边界：从任何像素起手都能对齐格子
@@ -3115,7 +3115,7 @@ async function onPointerUp(ev: PointerEvent) {
     const touched = selEvents.value;
     if (touched.length) {
       selection.value = {
-        lanes: [...new Set(touched.map((e: any) => e.lane))],
+        lanes: [...new Set<string>(touched.map((e: any) => e.lane))],
         startTick: Math.min(...touched.map((e: any) => e.tick)),
         endTick: Math.max(...touched.map((e: any) => e.tick + e.durTicks)),
       };
@@ -3156,7 +3156,7 @@ async function onPointerUp(ev: PointerEvent) {
      * 矩形本身不动（扩成外接范围会把中间那块也框进来，那就不是离散选中了）。
      */
     const base = pickedIds.value.length || !selection.value ? pickedIds.value : selEvents.value.map((e: any) => String(e.id));
-    pickedIds.value = base.includes(id) ? base.filter((x) => x !== id) : [...base, id];
+    pickedIds.value = base.includes(id) ? base.filter((x: string) => x !== id) : [...base, id];
     pickAnchor = { tick: hit.tick, lane: hit.lane };
     // 还没有矩形时补一个，详情栏才有东西可以描述
     if (!selection.value) selection.value = { lanes: [hit.lane], startTick: hit.tick, endTick: hit.tick + hit.durTicks };
@@ -3175,7 +3175,7 @@ async function onPointerUp(ev: PointerEvent) {
       .filter((e: any) => e.lane === hit.lane && e.tick >= lo && e.tick < hi)
       .map((e: any) => String(e.id));
     ids.push(String(hit.id));
-    pickedIds.value = [...new Set(ids)];
+    pickedIds.value = [...new Set<string>(ids)];
     pickAnchor = { tick: hit.tick, lane: hit.lane };
     if (!selection.value) selection.value = { lanes: [hit.lane], startTick: hit.tick, endTick: hit.tick + hit.durTicks };
     editing.value = null;
@@ -4478,8 +4478,8 @@ function copySelection() {
     text: String(e.text ?? ''),
   }));
   // 基准泳道取「最靠上的一条」，粘到别的泳道时按行号差落位
-  const baseLane = items.slice().sort((a, b) => laneIndexOf(a.lane) - laneIndexOf(b.lane))[0].lane;
-  clip.value = { items, baseTick: Math.min(...items.map((i) => i.tick)), baseLane };
+  const baseLane = items.slice().sort((a: any, b: any) => laneIndexOf(a.lane) - laneIndexOf(b.lane))[0].lane;
+  clip.value = { items, baseTick: Math.min(...items.map((i: any) => i.tick)), baseLane };
   lastAction.value = { key: 'grid.act.copy', vars: { n: items.length } };
   return items.length;
 }
@@ -5840,7 +5840,7 @@ onMounted(() => {
      * 一有异步就变成竞态。
      */
     describe: (text: string, key?: string) => {
-      const p = parseChord(String(text ?? ''), { key: key ?? null });
+      const p: any = parseChord(String(text ?? ''), { key: key ?? null });
       if (!p?.ok) return { ok: false, errors: p?.errors ?? [] };
       return { ok: true, text: describeWithNumeral(p, locale.value), degree: p.degree ?? null, alter: p.alter ?? null, neapolitan: !!p.neapolitan };
     },

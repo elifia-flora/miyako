@@ -67,7 +67,7 @@ function modeRank(id) {
 
 /**
  * @param {string} input 已敲内容（`c` / `c dor` / `C# 自然小调` / `降e` / `e-flat harm`）
- * @param {'zh'|'en'} locale 只影响 label，不影响 value
+ * @param {string} locale 只影响 label，不影响 value（'en' 出英文，其它出中文）
  * @param {number} limit 最多给几条
  * @returns {{ value: string, root: string, mode: string, label: string }[]}
  */

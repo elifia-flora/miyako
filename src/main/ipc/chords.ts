@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeFileAtomic } from '../atomic-write.js';
 
 /**
  * 字母和弦补全用的词表（`data/vocab/chord-symbols.json`）。
@@ -288,6 +289,6 @@ export function saveChordSymbols(
   const abs = chordSymbolsPath(dataDir);
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   // 2 空格缩进 + 结尾换行：跟其它词表一致，git diff 才只显示变化的行
-  fs.writeFileSync(abs, JSON.stringify(out, null, 2) + '\n', 'utf8');
+  writeFileAtomic(abs, JSON.stringify(out, null, 2) + '\n');
   return { ok: true, doc: out };
 }

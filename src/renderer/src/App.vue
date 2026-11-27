@@ -2067,12 +2067,12 @@ const menus = computed<any[]>(() => {
       label: t('menu.edit'),
       mnemonic: 'E',
       items: [
-        { label: t('menu.edit.undo'), accel: 'Ctrl+Z', action: 'undo', disabled: !hasAnalysis || !histMenu.undo },
-        { label: t('menu.edit.redo'), accel: 'Ctrl+Y', action: 'redo', disabled: !hasAnalysis || !histMenu.redo },
+        { label: t('menu.edit.undo'), accel: 'Ctrl+Z', action: 'undo', disabled: !hasAnalysis || !histMenu.value.undo },
+        { label: t('menu.edit.redo'), accel: 'Ctrl+Y', action: 'redo', disabled: !hasAnalysis || !histMenu.value.redo },
         { separator: true },
         // 全局那两个不看当前曲目：它撤的是「全局最后一步」，可能落在别的曲子上
-        { label: t('menu.edit.undoGlobal'), accel: 'Ctrl+Shift+Z', action: 'undo-global', disabled: !histMenu.gUndo },
-        { label: t('menu.edit.redoGlobal'), accel: 'Ctrl+Shift+Y', action: 'redo-global', disabled: !histMenu.gRedo },
+        { label: t('menu.edit.undoGlobal'), accel: 'Ctrl+Shift+Z', action: 'undo-global', disabled: !histMenu.value.gUndo },
+        { label: t('menu.edit.redoGlobal'), accel: 'Ctrl+Shift+Y', action: 'redo-global', disabled: !histMenu.value.gRedo },
         { separator: true },
         { label: t('menu.edit.deleteSel'), accel: 'Delete', action: 'delete-sel', disabled: !hasAnalysis },
         { label: t('menu.edit.clearSel'), accel: 'Esc', action: 'clear-sel', disabled: !hasAnalysis },
@@ -3292,7 +3292,7 @@ function fieldValue(field: EditField): string {
       return (d.aliases ?? []).join(' / ');
     case 'moods':
       // 编辑的是中文标签（怀旧 / 神秘），保存时再按词表翻回英文枚举
-      return (d.moods ?? []).map((m) => moodDisplay(m, locale.value)).join(', ');
+      return (d.moods ?? []).map((m: string) => moodDisplay(m, locale.value)).join(', ');
     case 'period':
       // 编辑的是「浪漫主义」这种显示名，保存时再翻回 romantic
       return d.period ? periodLabel(d.period, locale.value) : '';
@@ -6555,7 +6555,7 @@ onBeforeUnmount(() => {
       @mouseenter="cancelTipClose"
       @mouseleave="scheduleTipClose"
     >
-      {{ t(meterKind.noteKey) }}
+      {{ t(meterKind.noteKey as string) }}
     </div>
   </Teleport>
 </template>

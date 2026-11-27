@@ -14,8 +14,10 @@
  * `.prevent` 在组合期也会执行，会打断输入法把候选词上屏（用户连字都打不出来）。
  * 由处理函数在确认「不在组合态」之后再自己调 `preventDefault()`。
  */
-export function isComposing(ev: KeyboardEvent): boolean {
-  return ev.isComposing === true || ev.keyCode === 229;
+export function isComposing(ev: Event): boolean {
+  // keydown（KeyboardEvent）和 input（InputEvent）都带 isComposing；keyCode 只有前者有
+  const k = ev as Partial<Pick<KeyboardEvent, 'isComposing' | 'keyCode'>>;
+  return k.isComposing === true || k.keyCode === 229;
 }
 
 /**

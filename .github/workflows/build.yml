@@ -51,6 +51,9 @@ jobs:
       - name: 纯函数单测
         run: npm test
 
+      - name: 类型检查（主进程 / preload / 渲染层）
+        run: npm run typecheck
+
       - name: 打包
         env:
           # 没有证书：跳过签名，打出来的包首次打开需要手动放行

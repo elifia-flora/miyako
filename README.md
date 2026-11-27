@@ -92,7 +92,8 @@ Vue 绿高亮 + 深/浅双主题即时切换；搜索能认中文的时期与调
 npm run app                  # 打开窗口后命令立刻退出（脚本里用这个，不会挂在终端上）
 npm run dev                  # 开发模式（vite dev server + electron，带热更新）
 npm run build                # 只构建到 out/
-npm test                     # 纯函数单测：换算内核 / 网格数学 / 搜索 / 文件名 / 快捷键（401 项，含和弦解析 / 进行识别 / 小节时间码 / Tap / 时间码）
+npm test                     # 纯函数单测：换算内核 / 网格数学 / 搜索 / 文件名 / 快捷键（406 项，含和弦解析 / 进行识别 / 小节时间码 / Tap / 时间码 / 原子写盘）
+npm run typecheck            # 类型检查：主进程 + preload（tsc）、渲染层（vue-tsc）；CI 里同样会跑
 npm run check                # 校验词表/视图 JSON（无环、别名冲突、泳道字段）
 npm run import               # 跑导入器，重出清洗报告 + data/tracks/神鹿谣.json
 npm run smoke                # 构建后跑 602 项集成断言 + 截图到 shots/
