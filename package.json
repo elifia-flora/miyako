@@ -1,7 +1,7 @@
 {
   "name": "music-atlas",
   "productName": "miyako",
-  "version": "0.99.2",
+  "version": "0.99.3",
   "private": true,
   "description": "本地音乐标签库 + 和声分析网格（Electron + Vue）",
   "license": "Apache-2.0",

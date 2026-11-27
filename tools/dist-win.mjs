@@ -10,9 +10,16 @@
  * electron-builder，例如 `node tools/dist-win.mjs --dir`。
  */
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
+
+/** Windows PowerShell 5.1。PowerShell 7 的 powershell.exe 没有 Cert: 驱动器，New-SelfSignedCertificate 会失败。 */
+function windowsPowerShell() {
+  const v51 = 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe';
+  return fs.existsSync(v51) ? v51 : 'powershell.exe';
+}
 
 function run(command, args, env) {
   return new Promise((resolve, reject) => {
@@ -39,7 +46,7 @@ const env = { ...process.env };
 
 if (!env.WIN_CSC_LINK) {
   const ps = path.join(root, 'tools', 'win-sign-cert.ps1');
-  const minted = await run('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps], env);
+  const minted = await run(windowsPowerShell(), ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps], env);
   if (minted.code !== 0) {
     process.exit(minted.code);
   }

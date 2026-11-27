@@ -4,6 +4,12 @@
 # 文件属性的「数字签名」里能看到签名者是 elifia-flora。
 $ErrorActionPreference = 'Stop'
 
+# GitHub Actions 上 `powershell.exe` 有时是 PowerShell 7，默认没有 Cert: 驱动器。
+# Windows PowerShell 5.1 自带；7 要先载入 PKI。
+if (-not (Get-PSDrive -Name Cert -ErrorAction SilentlyContinue)) {
+  Import-Module PKI -ErrorAction Stop
+}
+
 $subject = 'CN=elifia-flora'
 $passwordPlain = 'elifia-flora'
 $out = Join-Path ([System.IO.Path]::GetTempPath()) 'miyako-elifia-flora.pfx'

@@ -51,4 +51,6 @@ test('Windows 强制签名，证书主体留给 elifia-flora 的 pfx', () => {
   assert.match(ps1, /CN=elifia-flora/);
   const dist = fs.readFileSync(path.join(root, 'tools', 'dist-win.mjs'), 'utf8');
   assert.match(dist, /WIN_CSC_LINK/);
+  assert.match(dist, /WindowsPowerShell\\\\v1\.0\\\\powershell\.exe/);
+  assert.match(ps1, /Import-Module PKI/);
 });
