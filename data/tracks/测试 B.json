@@ -1,6 +1,7 @@
 {
   "schemaVersion": 3,
   "uuid": "tr-mvesswr3inr",
+  "parentId": null,
   "title": {
     "original": "测试 B",
     "lang": null,
@@ -13,7 +14,11 @@
     "bpm": 33.33,
     "tempoUnit": null,
     "tempoChange": false,
-    "description": null
+    "description": null,
+    "formNumber": null,
+    "opusNumber": "Op.9 No.2",
+    "subType": null,
+    "tempoTerm": null
   },
   "period": null,
   "genre": null,
@@ -25,13 +30,27 @@
   "moods": [
     "mysterious"
   ],
-  "instrumentation": null,
+  "instrumentation": {
+    "abstract": "Orchestra"
+  },
   "covers": null,
   "lyrics": null,
   "instrumental": null,
-  "instrumentIds": [],
+  "instrumentIds": [
+    "violin",
+    "violoncello"
+  ],
   "derivedTags": [],
-  "techniques": [],
+  "techniques": [
+    {
+      "id": "tonicization",
+      "root": "harmonic"
+    },
+    {
+      "id": "pizzicato",
+      "root": "tech-strings"
+    }
+  ],
   "timeline": {
     "ppq": 480,
     "audioOffsetMs": 0,
@@ -132,6 +151,13 @@
       "confidence": "confirmed"
     },
     {
+      "lane": "note",
+      "tick": 11520,
+      "durTicks": 1920,
+      "text": "不喜欢",
+      "confidence": "confirmed"
+    },
+    {
       "lane": "degree",
       "tick": 13440,
       "durTicks": 960,
@@ -146,10 +172,17 @@
       "confidence": "confirmed"
     },
     {
+      "lane": "note",
+      "tick": 15360,
+      "durTicks": 1920,
+      "text": "日本",
+      "confidence": "confirmed"
+    },
+    {
       "lane": "chord",
       "tick": 19200,
       "durTicks": 1920,
-      "text": "cj",
+      "text": "Cmaj7",
       "confidence": "confirmed"
     },
     {

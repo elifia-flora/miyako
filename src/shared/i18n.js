@@ -79,6 +79,7 @@ const ZH = {
   'menu.search': '搜索',
   'menu.search.focus': '聚焦搜索框',
   'menu.search.clear': '清除搜索',
+  'menu.search.notes': '包含时间线备注',
   'menu.ws': '工作区',
   'menu.ws.save': '保存当前布局为…',
   'menu.ws.saveNote': '记住窗口位置与大小、面板、左右栏宽度、缩放、主题、泳道方案，以及三个子窗口的开合与位置。',
@@ -159,7 +160,9 @@ const ZH = {
 
   /* ---------------- 搜索行 ---------------- */
   'search.placeholder': '搜索曲名 / 作曲 / 调性 / 时期 / 流派 / 情绪 / 标签（多个关键词用空格分隔）',
+  'search.placeholderNotes': '搜索曲名 / 作曲 / 调性 / 时期 / 流派 / 情绪 / 标签 / 时间线备注（多个关键词用空格分隔）',
   'search.hint': '中文时期与调式会翻成库里的规范值再匹配；西文长词走全文索引',
+  'search.hintNotes': '中文时期与调式会翻成库里的规范值再匹配；西文长词走全文索引。时间线「备注」行里的文字也算。',
   'search.clear': '清除',
   'search.clearTitle': '清除搜索条件（Ctrl+Shift+F）',
 
@@ -512,9 +515,14 @@ const ZH = {
   'prefs.templateVarKind': '变量',
 
   'prefs.tabLook': '外观',
+  'prefs.tabSearch': '搜索',
   'prefs.tabEdit': '编辑',
   'prefs.tabPlay': '播放',
   'prefs.tabWin': '窗口',
+  'prefs.search': '搜索范围',
+  'prefs.searchNote':
+    '默认会把时间线面板「备注」行里写的字算进曲库搜索（排列方案的「排列备注」也算；乐章上的备注算到母作品）。和菜单「搜索」里的勾选是同一个开关。取消后，备注不再参与搜索。',
+  'prefs.searchNotes': '搜索时间线备注',
   'prefs.numeral': '转位数字写法',
   'prefs.numeralHan': '汉字（第一转位）',
   'prefs.numeralArabic': '阿拉伯（第1转位）',
@@ -1308,6 +1316,7 @@ const EN = {
   'menu.search': 'Search',
   'menu.search.focus': 'Focus search field',
   'menu.search.clear': 'Clear search',
+  'menu.search.notes': 'Include timeline notes',
   'menu.ws': 'Workspace',
   'menu.ws.save': 'Save current layout as…',
   'menu.ws.saveNote':
@@ -1389,7 +1398,10 @@ const EN = {
 
   /* ---------------- search row ---------------- */
   'search.placeholder': 'Search title / composer / key / period / genre / mood / tags (space-separated)',
+  'search.placeholderNotes': 'Search title / composer / key / period / genre / mood / tags / timeline notes (space-separated)',
   'search.hint': 'Chinese period and mode names are mapped to canonical values; long Latin words use the full-text index',
+  'search.hintNotes':
+    'Chinese period and mode names are mapped to canonical values; long Latin words use the full-text index. Text in the timeline note row is included.',
   'search.clear': 'Clear',
   'search.clearTitle': 'Clear search (Ctrl+Shift+F)',
 
@@ -1690,9 +1702,14 @@ const EN = {
   /* ---------------- options ---------------- */
   'prefs.title': 'Options',
   'prefs.tabLook': 'Appearance',
+  'prefs.tabSearch': 'Search',
   'prefs.tabEdit': 'Editing',
   'prefs.tabPlay': 'Playback',
   'prefs.tabWin': 'Windows',
+  'prefs.search': 'Search scope',
+  'prefs.searchNote':
+    'Text written in the timeline note row is included in library search by default (including voicing notes, and notes on a movement, which match the parent work). This is the same switch as Search → Include timeline notes. Turn it off and notes are left out.',
+  'prefs.searchNotes': 'Search timeline notes',
   'prefs.numeral': 'Inversion numerals',
   'prefs.numeralHan': 'Chinese numerals',
   'prefs.numeralArabic': 'Arabic numerals',

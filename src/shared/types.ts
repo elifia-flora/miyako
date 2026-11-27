@@ -392,6 +392,11 @@ export interface TrackQuery {
   tags?: { dim: string; id: string }[];
   limit?: number;
   offset?: number;
+  /**
+   * 是否把时间线「备注」泳道算进搜索。
+   * 缺省（以及 true）算进去；菜单 / 选项里取消勾选时传 false。
+   */
+  includeTimelineNotes?: boolean;
 }
 
 export interface TagSuggestion {

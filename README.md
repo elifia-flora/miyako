@@ -20,6 +20,7 @@
 
 自己打：`npm run dist:win` / `dist:mac` / `dist:linux`。**macOS 版必须在 macOS 上打**
 （dmg 依赖 hdiutil、签名依赖 codesign，交叉编译不被支持）——所以才配了 Actions。
+签名、预编译包、CI 发版和已经踩过的坑见 [`docs/PACKAGING.md`](docs/PACKAGING.md)。
 
 装好之后数据在 `%APPDATA%\miyako\data`（Windows），
 第一次启动会从安装目录复制一份种子过去：**词表 + 泳道方案 + 27 条曲库档案**
@@ -129,7 +130,7 @@ npm run app:debug            # 启动窗口并开 CDP（http://127.0.0.1:9222/js
 | `src/renderer/` | Vue 界面：曲库表格、canvas 网格、详情栏、设置 |
 | `fixtures/` | 各版 schema 的样本，做回归 |
 | `reference/` | 原始素材：`神鹿谣分析.json`（真样本源）＋ `tallydeck/`（播放器那边验证过的时间码/波形实现，供接音频时改造） |
-| `docs/` | 开发计划、schema-log、清洗报告、**界面结构与指代对照（`UI-STRUCTURE.md`）**、**tick 换算说明（`TICK.md`）**、**输入手感（`INPUT-FEEL.md`）** |
+| `docs/` | 开发计划、schema-log、清洗报告、**界面结构与指代对照（`UI-STRUCTURE.md`）**、**tick 换算说明（`TICK.md`）**、**输入手感（`INPUT-FEEL.md`）**、**打包注意事项（`PACKAGING.md`）** |
 | `.obsidian/` | 拿 Obsidian 打开仓库根目录就能看 `docs/`。这里**只有界面配置**（`app.json` / `appearance.json` / `core-plugins.json` / `workspace.json`）和 `snippets/` 里的标题配色 CSS，**不带任何插件** —— 插件的代码在各个库里自己的 `plugins/` 下，不在这儿 |
 | `<userData>/config.json` | **启动配置**：歌词 / 动态操作帮助是否自动打开、安全模式。文件不存在时启动生成；选项 → 窗口里可直接打开手改 |
 | `<userData>/wave-cache/` | 波形峰值缓存（可随时删；上限与清空在「选项 → 波形缓存」） |

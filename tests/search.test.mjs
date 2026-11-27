@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { expandQuery, periodLabel, keyModeLabel, splitTerms, termTable } from '../src/shared/search.js';
+import {
+  expandQuery,
+  isTimelineNoteLane,
+  keyModeLabel,
+  periodLabel,
+  splitTerms,
+  termTable,
+  TIMELINE_NOTE_LANE_SQL,
+} from '../src/shared/search.js';
 
 /**
  * 流派与情绪的词表是 data/vocab/*.json，不在代码里。
@@ -173,6 +181,20 @@ test('分词：带空格的调式名与词条名不能被拆散', () => {
   // Chamber Music / String Quartet 是体裁（带空格的词条），拆开就变成两个更宽的词
   assert.deepEqual(splitTerms('Chamber Music', TABLES), ['chamber music']);
   assert.deepEqual(splitTerms('浪漫 弦乐四重奏', TABLES), ['浪漫', '弦乐四重奏']);
+});
+
+test('时间线备注泳道：note 与 *-note，低音行不算', () => {
+  assert.equal(isTimelineNoteLane('note'), true);
+  assert.equal(isTimelineNoteLane('voicing-note'), true);
+  assert.equal(isTimelineNoteLane('bass'), false);
+  assert.equal(isTimelineNoteLane('degree'), false);
+  assert.equal(isTimelineNoteLane('chord'), false);
+  assert.equal(isTimelineNoteLane('notes'), false);
+  assert.equal(isTimelineNoteLane(''), false);
+  assert.equal(isTimelineNoteLane(null), false);
+  // SQL 片段必须表达同一条规则，不能只认 note、把排列备注漏掉
+  assert.match(TIMELINE_NOTE_LANE_SQL, /e\.lane = 'note'/);
+  assert.match(TIMELINE_NOTE_LANE_SQL, /GLOB '\*-note'/);
 });
 
 test('分词后逐词展开：整句里的时期不再污染其它词的条件', () => {

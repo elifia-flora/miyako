@@ -1171,6 +1171,7 @@ const showPrefs = ref(false);
  */
 const PREF_TABS = [
   { id: 'look', label: 'prefs.tabLook' },
+  { id: 'search', label: 'prefs.tabSearch' },
   { id: 'edit', label: 'prefs.tabEdit' },
   { id: 'play', label: 'prefs.tabPlay' },
   { id: 'win', label: 'prefs.tabWin' },
@@ -1508,6 +1509,11 @@ const bassAutofill = ref(readBool('ma-bass-autofill', false));
 const chordAutofill = ref(readBool('ma-chord-autofill', false));
 /** 级数写完顺手生成斯波索宾标记：自动只跟级数（字母和弦反推级数不可靠） */
 const sposobinAutofill = ref(readBool('ma-sposobin-autofill', false));
+/**
+ * 曲库搜索是否把时间线「备注」行算进去。
+ * 默认开 —— 用户就是为了能搜到备注才加的这一项；菜单和选项页是同一个开关。
+ */
+const searchNotes = ref(readBool('ma-search-notes', true));
 /**
  * 启动时自动打开「动态操作帮助」窗口（和歌词播报器同一时机：主窗口完全启动之后）。
  * 默认开 —— 这窗口就是给新手看手势的，藏着不如打开；嫌挡可以在窗口里关掉置顶或直接关窗。
@@ -2142,6 +2148,8 @@ const menus = computed<any[]>(() => {
       items: [
         { label: t('menu.search.focus'), accel: 'Ctrl+F', action: 'focus-search' },
         { label: t('menu.search.clear'), accel: 'Ctrl+Shift+F', action: 'clear-search' },
+        { separator: true },
+        { label: t('menu.search.notes'), action: 'toggle-search-notes', checked: searchNotes.value },
       ],
     },
     {
@@ -2197,6 +2205,13 @@ function clearSearch() {
   filterTags.value = [];
   closeSuggest();
   loadRows();
+}
+
+/** 菜单勾选和选项页复选框走同一条：落盘，搜索框里已经有词就立刻重查 */
+function setSearchNotes(on: boolean) {
+  searchNotes.value = on;
+  saveBool('ma-search-notes', on, 'searchNotes');
+  if (text.value.trim()) void loadRows();
 }
 
 /* ---------------- 搜索补全 ----------------
@@ -2416,6 +2431,8 @@ async function onMenuAction(name: string) {
       return focusSearch();
     case 'clear-search':
       return clearSearch();
+    case 'toggle-search-notes':
+      return setSearchNotes(!searchNotes.value);
     case 'prefs':
       showPrefs.value = true;
       return;
@@ -2808,7 +2825,11 @@ function seekToSection(s: any) {
  */
 async function loadRows(opts: { autoSelect?: boolean } = {}) {
   loading.value = true;
-  rows.value = await api.tracks.list({ text: text.value, tags: filterTags.value.map((id) => ({ dim: '', id })) });
+  rows.value = await api.tracks.list({
+    text: text.value,
+    tags: filterTags.value.map((id) => ({ dim: '', id })),
+    includeTimelineNotes: searchNotes.value,
+  });
   loading.value = false;
   if (opts.autoSelect !== false && !selectedId.value && rows.value.length) select(rows.value[0].id);
 }
@@ -4696,8 +4717,8 @@ onBeforeUnmount(() => {
               ref="searchEl"
               v-model="text"
               class="search"
-              :placeholder="t('search.placeholder')"
-              :title="t('search.hint')"
+              :placeholder="t(searchNotes ? 'search.placeholderNotes' : 'search.placeholder')"
+              :title="t(searchNotes ? 'search.hintNotes' : 'search.hint')"
               @keydown="onSearchKey"
               @focus="onSearchFocus"
               @blur="onSearchBlur"
@@ -5999,6 +6020,19 @@ onBeforeUnmount(() => {
             </button>
           </div>
           <p class="faint tiny">{{ t('prefs.numeralNote') }}</p>
+        </div>
+
+        <div class="s-sec" data-group="search">
+          <div class="s-h">{{ t('prefs.search') }}</div>
+          <p class="faint tiny">{{ t('prefs.searchNote') }}</p>
+          <label class="pref-row">
+            <input
+              type="checkbox"
+              :checked="searchNotes"
+              @change="setSearchNotes(($event.target as HTMLInputElement).checked)"
+            />
+            {{ t('prefs.searchNotes') }}
+          </label>
         </div>
 
         <div class="s-sec" data-group="edit">

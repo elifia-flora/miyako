@@ -209,3 +209,20 @@ export function keyModeLabel(id, locale = 'zh') {
   if (!hit) return String(id);
   return pickLabel(hit, locale);
 }
+
+/**
+ * 时间线面板里那行「备注」。
+ *
+ * 各泳道方案的备注行 id 是 `note`；和弦组成音方案写成 `voicing-note`（标签是「排列备注」）。
+ * 低音行的 kind 也叫 `note`，但 id 是 `bass` —— 那是音名，不能算进备注搜索，
+ * 否则搜一个字母会把写了低音的曲子全捞进来。
+ *
+ * SQL 片段必须和这个函数是同一条规则，别在查询里再手写一份。
+ */
+export function isTimelineNoteLane(lane) {
+  const id = String(lane ?? '');
+  return id === 'note' || id.endsWith('-note');
+}
+
+/** `analysis_event e` 上的备注泳道条件，和 isTimelineNoteLane 同一条规则。 */
+export const TIMELINE_NOTE_LANE_SQL = `(e.lane = 'note' OR e.lane GLOB '*-note')`;
