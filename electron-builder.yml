@@ -28,9 +28,13 @@ files:
   - 'node_modules/better-sqlite3/LICENSE'
   - 'node_modules/better-sqlite3/lib/**/*'
   # 预编译包按「系统-架构」给了八份，只带正在打的那个平台的一份。
-  # ${platform} = win32 / darwin / linux，${arch} = x64 / arm64，正好对上 prebuilds/ 里的文件名。
-  # 注意：不要在 win: / mac: / linux: 下面另写 files —— 平台级 files 会从「全部文件」重新起算，
+  # ${platform} 是 electron-builder 的宏，展开成「正在打包的这台机器」的 process.platform
+  # （win32 / darwin / linux），${arch} 是这次的目标架构（x64 / arm64）。
+  # CI 每个系统在自己的 runner 上打，所以和 better-sqlite3 的文件名对得上。
+  # 不要在 win: / mac: / linux: 下面另写 files —— 平台级 files 会从「全部文件」重新起算，
   # 0.99.1 的第一次构建就因此把 src/、tools/ 和冒烟代码一起打进了安装包。
+  # 也不要再写 !prebuilds/darwin-* 或 !prebuilds/linux*：那会把 mac / linux 唯一能加载的
+  # .node 删掉，进程在 openDb() 里、窗口出现之前就退出。
   - 'node_modules/better-sqlite3/prebuilds/${platform}-${arch}.node'
   - '!**/*.map'
   # 冒烟测试（src/main/smoke.ts）单独成 chunk，只在 --smoke 下加载，安装包里不带
@@ -61,11 +65,20 @@ electronLanguages: [zh-CN, zh-TW, ja, en-US]
 asar: true
 asarUnpack:
   - '**/*.node'
-# better-sqlite3 已经在 postinstall 里 electron-rebuild 过（Electron ABI），
-# 这里不要再联网重建一遍：构建机常常连不上 GitHub 的预编译包。
+# better-sqlite3 13 的预编译包是 Node-API，直接给 Electron 用。
+# 不要再联网重建：构建机常常连不上 GitHub，而且 build/ 整段被排除了，重建产物也不会进包。
 npmRebuild: false
 
+# 打包结束后核对目标平台的 prebuilds/*.node 在不在 app.asar.unpacked。
+# 缺了就让这次构建失败，而不是放出一个一点就退的安装包。
+afterPack: tools/verify-native.cjs
+
 win:
+  # 没有公共 CA 证书。dist:win 会造一张 CN=elifia-flora 的自签名 pfx（或沿用已设置的 WIN_CSC_LINK）。
+  # 签的是 exe / 安装器 / 免安装版。Electron 自带的 dll 保持原签名，不用这张不受信任的证书盖掉。
+  forceCodeSigning: true
+  signtoolOptions:
+    signingHashAlgorithms: [sha256]
   target:
     - target: nsis
       arch: [x64]
@@ -86,12 +99,33 @@ portable:
   artifactName: ${productName}-${version}-portable.${ext}
 
 # macOS 只能在 macOS（或 CI 的 macOS runner）上打：dmg 依赖 hdiutil、签名依赖 codesign。
+#
+# identity 必须是 "-"。构建工作流设了 CSC_IDENTITY_AUTO_DISCOVERY=false，
+# 这时如果不写 identity，electron-builder 26 会整段跳过签名，连 ad-hoc 都不打。
+# Apple Silicon 的内核不跑没有有效签名的 arm64 可执行文件；ad-hoc 过得了这一关，
+# 自签名的「CN=elifia-flora」过不了（证书链不受信任，AMFI 直接杀掉）。
+# 所以 mac 的签名者显示为 adhoc，不是 GitHub 用户名。要显示 elifia-flora，
+# 得有 Apple Developer ID，并把 CSC_LINK 配上，同时删掉下面这行 identity。
 mac:
-  target: [dmg, zip]
+  identity: "-"
+  hardenedRuntime: true
+  # ad-hoc 过不了 Gatekeeper 的 spctl 评估。这里显式关掉（electron-builder 26 的默认也是关）。
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.inherit.plist
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip
+      arch: [arm64, x64]
   category: public.app-category.music
   artifactName: ${productName}-${version}-${arch}.${ext}
 
 linux:
-  target: [AppImage]
+  # AppImage 没有 macOS / Windows 那种内核强制签名。能启动靠的是 linux-<arch>.node 在包里。
+  maintainer: elifia-flora
+  target:
+    - target: AppImage
+      arch: [x64]
   category: Audio
   artifactName: ${productName}-${version}-${arch}.${ext}

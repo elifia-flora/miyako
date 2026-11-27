@@ -1,5 +1,14 @@
 # 更新记录
 
+## 0.99.2（2026-11-27）
+
+界面没有改动。这一版只修三平台安装包打不开，以及 Windows 的签名。
+
+- macOS：`identity: "-"`，打 ad-hoc 签名。Apple Silicon 的内核因此肯运行；没有 Apple 公证，从浏览器下载后第一次仍可能要右键打开。同时打 arm64 与 x64。
+- Windows：安装包和免安装版用自签名证书签上 `CN=elifia-flora`，并加 DigiCert 时间戳。证书不在公共信任链上，SmartScreen 仍会提示未知发布者。
+- macOS / Linux：安装包必须带上对应的 `better-sqlite3` 预编译包，缺了就让这次构建失败，不再放出一点就退的包。
+- Linux：仍是 x64、glibc 的 AppImage，没有 GPG 签名。
+
 ## 0.99.1（2026-11-23）
 
 界面没有任何改动（渲染层 CSS 与 0.99.0 逐条一致），这一版只修数据安全、打包和工程问题。

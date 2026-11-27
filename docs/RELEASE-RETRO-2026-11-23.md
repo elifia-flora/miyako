@@ -152,6 +152,8 @@ electron-builder 看到项目里有 GitHub 仓库，就想顺手把构建结果�
 
 ## 五、现在的状态
 
+> 这是 2026-11-23 当天的快照。mac 的 ad-hoc 签名、三平台的 better-sqlite3 预编译包、Windows 的自签名，以仓库里的 `electron-builder.yml` 和 README「下载」一节为准，不要按下面这张表里的「没签名 / 右键打开」去放行一个完全没签名的 arm64 包。
+
 | 东西 | 状态 |
 |---|---|
 | 公开仓库 | https://github.com/elifia-flora/miyako —— 已公开，单条提交，历史干净 |

@@ -1,7 +1,7 @@
 {
   "name": "music-atlas",
   "productName": "miyako",
-  "version": "0.99.1",
+  "version": "0.99.2",
   "private": true,
   "description": "本地音乐标签库 + 和声分析网格（Electron + Vue）",
   "license": "Apache-2.0",
@@ -31,7 +31,7 @@
     "fix:integrity": "node tools/fix-integrity.mjs",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "postinstall": "electron-rebuild -f -w better-sqlite3",
-    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:win": "electron-vite build && node tools/dist-win.mjs",
     "dist:mac": "electron-vite build && electron-builder --mac --publish never",
     "dist:linux": "electron-vite build && electron-builder --linux --publish never"
   },

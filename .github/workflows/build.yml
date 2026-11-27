@@ -1,8 +1,13 @@
 # 在 GitHub 的机器上打三平台安装包 —— 包括本机做不出来的 macOS。
 #
-# 为什么需要它：dmg 依赖 macOS 的 hdiutil、苹果签名的 codesign，Windows / Linux
-# 都做不了（交叉编译没有被支持）。这里用 macOS runner 打，产出 zip / dmg 作为
-# workflow artifact 下载即可，不签名（首次打开要右键 → 打开）。
+# 为什么需要它：dmg 依赖 macOS 的 hdiutil、签名依赖 codesign，Windows / Linux
+# 都做不了（交叉编译没有被支持）。macOS runner 打 zip / dmg。
+#
+# mac 的签名是 ad-hoc（electron-builder.yml 里 identity: "-"），不是 Apple 公证。
+# 没有这层签名时，Apple Silicon 会在内核里拒绝 arm64，右键「打开」也没用。
+# 有了 ad-hoc 之后，从浏览器下载仍可能被 Gatekeeper 拦住，那时右键 → 打开，
+# 或 xattr -cr，才过得去。Windows 包由 dist:win 签上 CN=elifia-flora（自签名，
+# SmartScreen 仍会提示未知发布者）。
 name: build
 
 on:
@@ -56,25 +61,33 @@ jobs:
 
       - name: 打包
         env:
-          # 没有证书：跳过签名，打出来的包首次打开需要手动放行
+          # 阻止 electron-builder 在 runner 上乱挑一把 Developer ID。
+          # mac 仍会签名：electron-builder.yml 的 identity: "-" 是 ad-hoc，
+          # 这条环境变量挡不住它。Windows 的证书由 tools/dist-win.mjs 放进 WIN_CSC_LINK。
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npm run ${{ matrix.script }}
 
       # 产物直接从 GitHub 传上去：本地再下载一遍、再上传，是最慢的一条路
       # （本机到 GitHub 只有 ~60KB/s，268MB 的 mac 产物要一个多小时）。
-      - name: 上传到 Release（填了 release_tag 才做）
-        if: ${{ inputs.release_tag != '' }}
+      # 推 v* tag 时传到同名 Release；手动跑时只有填了 release_tag 才传。
+      - name: 上传到 Release
+        if: ${{ inputs.release_tag != '' || startsWith(github.ref, 'refs/tags/v') }}
         shell: bash   # Windows runner 默认是 pwsh，这里要用 bash 的数组语法
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
+          TAG="${{ inputs.release_tag }}"
+          if [ -z "$TAG" ]; then TAG="${GITHUB_REF_NAME}"; fi
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --verify-tag --notes "见 CHANGELOG。" || gh release view "$TAG" >/dev/null
+          fi
           case "${{ matrix.os }}" in
             windows-latest) FILES=(dist/*.exe) ;;
             macos-latest)   FILES=(dist/*.dmg dist/*.zip) ;;
             ubuntu-latest)  FILES=(dist/*.AppImage) ;;
           esac
-          gh release upload "${{ inputs.release_tag }}" "${FILES[@]}" --clobber
+          gh release upload "$TAG" "${FILES[@]}" --clobber
 
       - uses: actions/upload-artifact@v4
         with:

@@ -14,9 +14,9 @@
 
 | 平台 | 怎么拿 |
 |---|---|
-| **Windows** | [Releases](https://github.com/elifia-flora/miyako/releases) 里下 `miyako-*-setup.exe`（安装）或 `miyako-*-portable.exe`（免安装，解压即用）。没有代码签名，Windows 可能拦一下 →「更多信息 → 仍要运行」 |
-| **macOS** | [Releases](https://github.com/elifia-flora/miyako/releases) 里有 `miyako-*-arm64.dmg` / `.zip`（Apple Silicon）。没签名没公证，第一次打开要「右键 → 打开」 |
-| **Linux** | 同一页有 `miyako-*-x86_64.AppImage`，双击即用（没权限就 `chmod +x`） |
+| **Windows** | [Releases](https://github.com/elifia-flora/miyako/releases) 里下 `miyako-*-setup.exe`（安装）或 `miyako-*-portable.exe`（免安装）。两者都用自签名证书签过，签名者是 `CN=elifia-flora`。这不是公共 CA 的证书，SmartScreen 仍会拦 →「更多信息 → 仍要运行」。文件属性 → 数字签名里能看到这个名字 |
+| **macOS** | 同一页有 Apple Silicon（`arm64`）和 Intel（`x64`）的 dmg / zip。包是 **ad-hoc 签名**，没有 Apple 公证，签名者不是 GitHub 用户名。ad-hoc 让 Apple Silicon 的内核肯运行；从浏览器下载后 Gatekeeper 仍可能拦住，第一次用「右键 → 打开」或系统设置里的「仍要打开」。完全没签名的旧包即使用这两步也会闪退，`xattr -cr` 只去隔离属性、不补签名 |
+| **Linux** | 同一页有 `miyako-*-x86_64.AppImage`（glibc，x64）。双击即用（没权限就 `chmod +x`）。没有 GPG 签名；AppImage 不靠代码签名才能启动 |
 
 自己打：`npm run dist:win` / `dist:mac` / `dist:linux`。**macOS 版必须在 macOS 上打**
 （dmg 依赖 hdiutil、签名依赖 codesign，交叉编译不被支持）——所以才配了 Actions。
