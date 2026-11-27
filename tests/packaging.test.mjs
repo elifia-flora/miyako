@@ -53,4 +53,5 @@ test('Windows 强制签名，证书主体留给 elifia-flora 的 pfx', () => {
   assert.match(dist, /WIN_CSC_LINK/);
   assert.match(ps1, /CreateSelfSigned/);
   assert.doesNotMatch(ps1, /Cert:\\CurrentUser/);
+  assert.doesNotMatch(ps1, /ConvertTo-SecureString/);
 });

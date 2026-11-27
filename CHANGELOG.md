@@ -1,5 +1,9 @@
 # 更新记录
 
+## 0.99.5（2026-11-27）
+
+- 导出 pfx 时不再调用 `ConvertTo-SecureString`。0.99.4 在 CI 上加载不了 `Microsoft.PowerShell.Security`，Windows 包还是没打出来。
+
 ## 0.99.4（2026-11-27）
 
 - Windows 自签名证书不再走 `Cert:` 驱动器。0.99.3 在 CI 上载入 PKI 之后这块盘仍然不存在，安装包还是没打出来。

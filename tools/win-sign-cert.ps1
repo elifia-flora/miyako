@@ -1,9 +1,6 @@
-# 造一张一次性的 Authenticode 自签名证书，主体 CN=elifia-flora。
-# 私钥不进仓库：每次打 Windows 包时现做、导出 pfx。
-# 不用 Cert: 驱动器。GitHub Actions 上的 PowerShell 7 没有这块盘，
-# New-SelfSignedCertificate -CertStoreLocation 会直接失败。
-# 这张证书不在任何公共 CA 上，SmartScreen 仍会显示未知发布者；
-# 文件属性的「数字签名」里能看到签名者是 elifia-flora。
+# One-shot Authenticode cert, subject CN=elifia-flora.
+# Do not use the Cert: drive or a SecureString.
+# GitHub Actions PowerShell cannot load Microsoft.PowerShell.Security.
 $ErrorActionPreference = 'Stop'
 
 $subject = 'CN=elifia-flora'
@@ -36,8 +33,10 @@ try {
   $notAfter = [DateTimeOffset]::UtcNow.AddYears(5)
   $cert = $request.CreateSelfSigned($notBefore, $notAfter)
   try {
-    $pwd = ConvertTo-SecureString -String $passwordPlain -Force -AsPlainText
-    $bytes = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $pwd)
+    $bytes = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $passwordPlain)
+    if ($null -eq $bytes -or $bytes.Length -eq 0) {
+      throw 'PFX export returned no bytes'
+    }
     [System.IO.File]::WriteAllBytes($out, $bytes)
   }
   finally {
