@@ -4,6 +4,7 @@ import { dialog } from 'electron';
 import { probeAudioInfo } from '../../shared/audiofile.js';
 import { mt } from '../locale';
 import { AUDIO_EXT, fileSizeOf, readHead, resolveAudio, type Ctx } from './audio';
+import { hashFile } from './filehash';
 
 /** 只查库、不碰文件的函数只需要 db：分析 / 曲目模块手上只有 `{ db }` */
 type DbCtx = Pick<Ctx, 'db'>;
@@ -67,6 +68,13 @@ export interface Recording {
   url: string;
   /** 这条录音名下的自定义协议地址（便于将来按录音取音频） */
   recUrl: string;
+  /**
+   * 这一演奏版本自己的歌词（相对 data/）。空 = 退回作品级歌词。
+   * 音质行不使用这两列，读的时候会走到父版本。
+   */
+  lyricsRel: string | null;
+  /** 这一演奏版本自己的封面（相对 data/）。空 = 退回作品独立封面，再没有才用专辑封面。 */
+  coverRel: string | null;
 }
 
 export interface RecordingPatch {
@@ -96,6 +104,8 @@ export interface RecordingPatch {
   note?: string;
   /** 外部网络链接；传空串表示清掉 */
   link?: string;
+  /** 文件内容的 SHA-256。换了文件却没给新哈希时，旧哈希会被清掉，免得去重认错人 */
+  fileHash?: string | null;
   /** 时间线原点偏移（ms）；不传 = 保持原值 */
   audioOffsetMs?: number;
 }
@@ -197,7 +207,71 @@ function rowToRecording(r: any, exists: (p: string) => boolean): Recording {
     isExternal: !r.file_path && !!r.link,
     url: '',
     recUrl: `ma-audio://rec/${encodeURIComponent(r.track_id)}/${encodeURIComponent(r.id)}`,
+    lyricsRel: r.lyrics_rel ? String(r.lyrics_rel) : null,
+    coverRel: r.cover_rel ? String(r.cover_rel) : null,
   };
+}
+
+/**
+ * 音质行没有自己的歌词和封面。给一个录音 id，返回它所属的演奏版本。
+ * 已经是演奏版本时就返回自己。
+ */
+export function versionMaster(
+  ctx: DbCtx,
+  recId: string
+): { id: string; trackId: string; lyricsRel: string | null; coverRel: string | null } | null {
+  const r = ctx.db
+    .prepare(
+      `SELECT id, track_id, parent_id, lyrics_rel, cover_rel FROM recording WHERE id = ? AND deleted_at IS NULL`
+    )
+    .get(recId) as any;
+  if (!r) return null;
+  if (!r.parent_id) {
+    return {
+      id: r.id,
+      trackId: r.track_id,
+      lyricsRel: r.lyrics_rel ? String(r.lyrics_rel) : null,
+      coverRel: r.cover_rel ? String(r.cover_rel) : null,
+    };
+  }
+  const p = ctx.db
+    .prepare(
+      `SELECT id, track_id, lyrics_rel, cover_rel FROM recording
+        WHERE id = ? AND parent_id IS NULL AND deleted_at IS NULL`
+    )
+    .get(r.parent_id) as any;
+  if (!p) return null;
+  return {
+    id: p.id,
+    trackId: p.track_id,
+    lyricsRel: p.lyrics_rel ? String(p.lyrics_rel) : null,
+    coverRel: p.cover_rel ? String(p.cover_rel) : null,
+  };
+}
+
+/** 只改演奏版本上的歌词 / 封面路径。传音质行的 id 会写到它的父版本上。 */
+export function setVersionMedia(
+  ctx: DbCtx,
+  recId: string,
+  patch: { lyricsRel?: string | null; coverRel?: string | null }
+): { id: string; trackId: string } | null {
+  const master = versionMaster(ctx, recId);
+  if (!master) return null;
+  const sets: string[] = [];
+  const args: unknown[] = [];
+  if (patch.lyricsRel !== undefined) {
+    sets.push('lyrics_rel = ?');
+    args.push(patch.lyricsRel || null);
+  }
+  if (patch.coverRel !== undefined) {
+    sets.push('cover_rel = ?');
+    args.push(patch.coverRel || null);
+  }
+  if (!sets.length) return { id: master.id, trackId: master.trackId };
+  sets.push('updated_at = ?');
+  args.push(Date.now(), master.id);
+  ctx.db.prepare(`UPDATE recording SET ${sets.join(', ')} WHERE id = ?`).run(...args);
+  return { id: master.id, trackId: master.trackId };
 }
 
 /**
@@ -298,6 +372,12 @@ export function saveRecording(ctx: Ctx, patch: RecordingPatch): Recording {
       recorded_year: patch.recordedYear !== undefined ? patch.recordedYear : cur.recorded_year,
       release_year: patch.releaseYear !== undefined ? patch.releaseYear : cur.release_year,
       file_path: patch.filePath !== undefined ? patch.filePath : cur.file_path,
+      file_hash:
+        patch.fileHash !== undefined
+          ? patch.fileHash || null
+          : patch.filePath !== undefined && patch.filePath !== cur.file_path
+            ? null
+            : cur.file_hash ?? null,
       duration_ms: patch.durationMs !== undefined ? patch.durationMs : cur.duration_ms,
       format: patch.format !== undefined ? patch.format : cur.format,
       sample_rate: patch.sampleRate !== undefined ? patch.sampleRate : cur.sample_rate,
@@ -309,13 +389,13 @@ export function saveRecording(ctx: Ctx, patch: RecordingPatch): Recording {
         `UPDATE recording SET performers = ?, credits_json = ?, orchestra = ?, conductor = ?,
            soloist = ?, recording_place = ?, mix_engineer = ?, mastering_engineer = ?,
            label = ?, catalog_no = ?, note = ?, recorded_year = ?, release_year = ?,
-           file_path = ?, duration_ms = ?, format = ?, sample_rate = ?, channels = ?, bits = ?,
+           file_path = ?, file_hash = ?, duration_ms = ?, format = ?, sample_rate = ?, channels = ?, bits = ?,
            link = ?, audio_offset_ms = ?, updated_at = ? WHERE id = ?`
       )
       .run(
         perf, credits, merged.orchestra, merged.conductor, merged.soloist, merged.recording_place,
         merged.mix_engineer, merged.mastering_engineer, merged.label, merged.catalog_no,
-        merged.note, merged.recorded_year, merged.release_year, merged.file_path, merged.duration_ms,
+        merged.note, merged.recorded_year, merged.release_year, merged.file_path, merged.file_hash, merged.duration_ms,
         merged.format, merged.sample_rate, merged.channels, merged.bits, merged.link,
         merged.audio_offset_ms, now, patch.id
       );
@@ -352,9 +432,9 @@ export function saveRecording(ctx: Ctx, patch: RecordingPatch): Recording {
     .prepare(
       `INSERT INTO recording (id, track_id, parent_id, performers, credits_json, orchestra, conductor, soloist,
          recording_place, recorded_year, mix_engineer, mastering_engineer, label, catalog_no,
-         release_year, file_path, duration_ms, format, sample_rate, channels, bits,
+         release_year, file_path, file_hash, duration_ms, format, sample_rate, channels, bits,
          is_default, note, link, audio_offset_ms, seq_order, added_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
     )
     .run(
       id, patch.trackId, parentId, perf, credits,
@@ -362,7 +442,7 @@ export function saveRecording(ctx: Ctx, patch: RecordingPatch): Recording {
       patch.recordingPlace ?? '', patch.recordedYear ?? null,
       patch.mixEngineer ?? '', patch.masteringEngineer ?? '',
       patch.label ?? '', patch.catalogNo ?? '', patch.releaseYear ?? null,
-      patch.filePath ?? '', patch.durationMs ?? 0, patch.format ?? null,
+      patch.filePath ?? '', patch.fileHash || null, patch.durationMs ?? 0, patch.format ?? null,
       patch.sampleRate ?? 0, patch.channels ?? 0, patch.bits ?? 0,
       0, patch.note ?? '', normLink(patch.link),
       Math.round(Number(patch.audioOffsetMs) || 0), nextOrder, now, now
@@ -386,20 +466,22 @@ export function saveRecording(ctx: Ctx, patch: RecordingPatch): Recording {
 function effectiveFile(
   ctx: Ctx,
   trackId: string,
-  rec: { id: string; file_path?: string | null; duration_ms?: number | null }
-): { file_path: string; duration_ms: number | null } | null {
+  rec: { id: string; file_path?: string | null; duration_ms?: number | null; file_hash?: string | null }
+): { file_path: string; duration_ms: number | null; file_hash: string | null } | null {
   if (rec.file_path && fileOk(rec.file_path)) {
-    return { file_path: rec.file_path, duration_ms: rec.duration_ms ?? null };
+    return { file_path: rec.file_path, duration_ms: rec.duration_ms ?? null, file_hash: rec.file_hash ?? null };
   }
   const kids = ctx.db
     .prepare(
-      `SELECT file_path, duration_ms FROM recording
+      `SELECT file_path, duration_ms, file_hash FROM recording
         WHERE track_id = ? AND parent_id = ? AND deleted_at IS NULL
         ORDER BY seq_order, seq`
     )
     .all(trackId, rec.id) as any[];
   const hit = kids.find((k) => fileOk(k.file_path));
-  return hit ? { file_path: hit.file_path, duration_ms: hit.duration_ms ?? null } : null;
+  return hit
+    ? { file_path: hit.file_path, duration_ms: hit.duration_ms ?? null, file_hash: hit.file_hash ?? null }
+    : null;
 }
 
 /** 把作品的主文件指针指向某条演奏版本实际会播的文件（可能是它的某个音质文件） */
@@ -409,8 +491,10 @@ function syncTrackFromRecording(ctx: Ctx, trackId: string, recId: string) {
   const eff = effectiveFile(ctx, trackId, r);
   if (!eff) return;
   ctx.db
-    .prepare(`UPDATE track SET file_path = ?, duration_ms = COALESCE(?, duration_ms), updated_at = ? WHERE id = ?`)
-    .run(eff.file_path, eff.duration_ms || null, Date.now(), trackId);
+    .prepare(
+      `UPDATE track SET file_path = ?, duration_ms = COALESCE(?, duration_ms), file_hash = ?, updated_at = ? WHERE id = ?`
+    )
+    .run(eff.file_path, eff.duration_ms || null, eff.file_hash, Date.now(), trackId);
 }
 
 function fileOk(p: unknown): boolean {
@@ -444,7 +528,7 @@ function writeOrder(ctx: Ctx, trackId: string, ids: string[]) {
 function normalizeOrder(ctx: Ctx, trackId: string) {
   const all = ctx.db
     .prepare(
-      `SELECT id, file_path, duration_ms FROM recording
+      `SELECT id, file_path, duration_ms, file_hash FROM recording
         WHERE track_id = ? AND deleted_at IS NULL AND parent_id IS NULL
         ORDER BY seq_order, seq`
     )
@@ -533,9 +617,11 @@ export async function pickRecordingAudio(ctx: Ctx, trackId: string, recId?: stri
   if (res.canceled || !res.filePaths.length) return null;
   const file = res.filePaths[0];
   const info = probeAudioInfo(readHead(file), fileSizeOf(file));
+  const fileHash = await hashFile(file).catch(() => null);
   const patch: RecordingPatch = {
     trackId,
     filePath: file,
+    fileHash,
     durationMs: info?.durationMs ?? null,
     format: info?.format ?? null,
     sampleRate: info?.sampleRate ?? null,
@@ -569,10 +655,12 @@ export async function pickRecordingVariant(ctx: Ctx, parentId: string): Promise<
   if (res.canceled || !res.filePaths.length) return null;
   const file = res.filePaths[0];
   const info = probeAudioInfo(readHead(file), fileSizeOf(file));
+  const fileHash = await hashFile(file).catch(() => null);
   return saveRecording(ctx, {
     trackId: parent.track_id,
     parentId: parent.id,
     filePath: file,
+    fileHash,
     durationMs: info?.durationMs ?? null,
     format: info?.format ?? null,
     sampleRate: info?.sampleRate ?? null,

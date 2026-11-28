@@ -15,6 +15,8 @@ import sql009 from './migrations/009_composition.sql?raw';
 import sql010 from './migrations/010_chord_lane_split.sql?raw';
 import sql011 from './migrations/011_movement_parent.sql?raw';
 import sql012 from './migrations/012_recording_variant.sql?raw';
+import sql013 from './migrations/013_recording_hash.sql?raw';
+import sql014 from './migrations/014_recording_media.sql?raw';
 
 const MIGRATIONS: { version: number; name: string; sql: string }[] = [
   { version: 1, name: '001_init', sql: sql001 },
@@ -29,6 +31,8 @@ const MIGRATIONS: { version: number; name: string; sql: string }[] = [
   { version: 10, name: '010_chord_lane_split', sql: sql010 },
   { version: 11, name: '011_movement_parent', sql: sql011 },
   { version: 12, name: '012_recording_variant', sql: sql012 },
+  { version: 13, name: '013_recording_hash', sql: sql013 },
+  { version: 14, name: '014_recording_media', sql: sql014 },
 ];
 
 export interface DbHandle {

@@ -121,6 +121,7 @@ function publishPlayerState() {
         durationMs: state.durationMs,
         ready: state.ready,
         gain: state.gain,
+        recId: state.recId,
       });
     }
   } catch { /* 窗口还没就绪 */ }

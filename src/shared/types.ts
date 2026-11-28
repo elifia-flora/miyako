@@ -276,6 +276,10 @@ export interface Recording {
   url: string;
   /** 按录音取的协议地址 ma-audio://rec/<trackId>/<recId> */
   recUrl: string;
+  /** 这一演奏版本自己的歌词，相对 data/。空则用作品级歌词。 */
+  lyricsRel: string | null;
+  /** 这一演奏版本自己的封面，相对 data/。空则用作品封面。 */
+  coverRel: string | null;
 }
 
 export interface RecordingPatch {
@@ -517,7 +521,11 @@ export interface LyricsStyle {
 
 export interface LyricLine {
   ms: number;
+  /** SRT 的高亮结束（不含）。普通 LRC 没有这个字段，高亮留到下一句。 */
+  endMs?: number;
   text: string;
+  /** 增强 LRC 的逐字时间。播放器这一轮只用来判断「不能写回」，不高亮逐字。 */
+  words?: { ms: number; text: string }[];
 }
 
 export interface LyricDoc {
@@ -529,7 +537,13 @@ export interface LyricDoc {
   meta: { ti: string; ar: string; al: string; by: string; offset: number; credits: string[] };
   /** 纯音乐：没有歌词是正常的 */
   instrumental: boolean;
-  how: 'manual' | 'auto' | 'none';
+  /** version = 演奏版本自己的文件；manual = 作品级；auto = 按曲名对上的 .lrc */
+  how: 'version' | 'manual' | 'auto' | 'none';
+  /** lrc 才能双击改。elrc / srt 保持原文件，避免写回时丢掉逐字或结束时间。 */
+  format: 'lrc' | 'elrc' | 'srt' | 'none';
+  editable: boolean;
+  /** 这份歌词挂在哪一个演奏版本上。作品级和自动匹配是 null。 */
+  recId: string | null;
 }
 
 export interface PlayerState {
@@ -549,6 +563,8 @@ export interface PlayerState {
    * 歌词窗口的滑块还停在旧位置，看着像「音量没同步」。
    */
   gain: number;
+  /** 正在听的演奏版本。歌词和封面跟着它走；空 = 主录音。 */
+  recId: string | null;
 }
 
 export type PlayerCommand =
@@ -778,12 +794,16 @@ export interface Api {
   art: {
     pick(trackId: string, kind: 'single' | 'album'): Promise<CoverSet | null>;
     clear(trackId: string, kind: 'single' | 'album'): Promise<CoverSet | null>;
+    /** 清掉某一个演奏版本自己的封面，不影响作品级封面 */
+    clearVersion(trackId: string, recId: string): Promise<CoverSet | null>;
   };
-  /** 歌词：解析好的行 + 元信息 */
+  /** 歌词：解析好的行 + 元信息。recId 用来走「版本 → 作品 → 自动匹配」。 */
   lyrics: {
-    resolve(trackId: string): Promise<LyricDoc>;
+    resolve(trackId: string, recId?: string | null): Promise<LyricDoc>;
     pick(trackId: string): Promise<LyricDoc | null>;
     clear(trackId: string): Promise<LyricDoc | null>;
+    /** 清掉演奏版本自己的歌词，作品级歌词不动 */
+    clearVersion(trackId: string, recId: string): Promise<LyricDoc | null>;
     setInstrumental(trackId: string, on: boolean): Promise<LyricDoc | null>;
     /** 桌面歌词样式：主窗口写、浮窗收广播 */
     style(): Promise<LyricsStyle>;

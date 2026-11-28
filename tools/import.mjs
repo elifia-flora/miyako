@@ -412,8 +412,8 @@ out.push('');
 out.push('> 注意：`modulation` 在词表里同时挂在 melodic 与 harmonic 下，展平后会有两条父子边——这是 DAG 的正常表现，不是重复数据。');
 out.push('');
 
-fs.mkdirSync(path.join(ROOT, 'docs'), { recursive: true });
-const reportFile = path.join(ROOT, 'docs', '清洗报告-神鹿谣.md');
+const reportFile = path.join(ROOT, 'docs', 'archive', '清洗报告-神鹿谣.md');
+fs.mkdirSync(path.dirname(reportFile), { recursive: true });
 fs.writeFileSync(reportFile, out.join('\n'), 'utf8');
 
 /* ------------------------------------------------------------------ */

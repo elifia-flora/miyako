@@ -48,7 +48,7 @@ function tryJson(line) {
 /**
  * @param {string} text LRC 文件内容
  * @returns {{
- *   lines: { ms: number, text: string }[],
+ *   lines: { ms: number, endMs?: number, text: string, words?: { ms: number, text: string }[] }[],
  *   meta: { ti: string, ar: string, al: string, by: string, offset: number, credits: string[] },
  * }}
  */
@@ -106,7 +106,16 @@ export function parseLrc(text) {
 
     const body = rest.trim();
     if (!body) continue;
-    for (const ms of stamps) lines.push({ ms, text: body });
+    // 增强 LRC：`<00:12.34>字` 留在 words 里。显示用的 text 只是去掉时间标记后的原文，
+    // 不在字与字之间另加空格（中文会多出空隙）。
+    const enhanced = splitEnhanced(body);
+    const text = enhanced ? enhanced.text : body;
+    if (!text) continue;
+    for (const ms of stamps) {
+      const line = { ms, text };
+      if (enhanced) line.words = enhanced.words.map((w) => ({ ms: w.ms, text: w.text }));
+      lines.push(line);
+    }
   }
 
   // 稳定排序：同一毫秒保持文件顺序（Array#sort 在现代 V8 里是稳定的）
@@ -114,7 +123,10 @@ export function parseLrc(text) {
 
   if (meta.offset) {
     const d = meta.offset;
-    for (const l of lines) l.ms = Math.max(0, l.ms + d);
+    for (const l of lines) {
+      l.ms = Math.max(0, l.ms + d);
+      if (l.words) for (const w of l.words) w.ms = Math.max(0, w.ms + d);
+    }
   }
 
   return { lines, meta };
@@ -138,7 +150,37 @@ export function activeLineIndex(lines, ms) {
       hi = mid - 1;
     }
   }
+  if (hit < 0) return -1;
+  // SRT 有结束时间：句子已经结束、下一句还没开始时，不高亮任何一行。
+  // 普通 LRC 没有 endMs，高亮一直留到下一句，和以前一样。
+  const end = arr[hit].endMs;
+  if (typeof end === 'number' && Number.isFinite(end) && ms >= end) return -1;
   return hit;
+}
+
+const WORD_TAG = /<(\d{1,4}):(\d{1,2})(?:[.:](\d{1,3}))?>/g;
+
+/** 没有逐字标记就返回 null，调用方按普通句子处理。 */
+function splitEnhanced(body) {
+  WORD_TAG.lastIndex = 0;
+  if (!WORD_TAG.test(body)) return null;
+  WORD_TAG.lastIndex = 0;
+  const words = [];
+  let m;
+  const marks = [];
+  while ((m = WORD_TAG.exec(body))) {
+    marks.push({ index: m.index, len: m[0].length, ms: toMs(m[1], m[2], m[3]) });
+  }
+  for (let i = 0; i < marks.length; i++) {
+    const start = marks[i].index + marks[i].len;
+    const end = i + 1 < marks.length ? marks[i + 1].index : body.length;
+    const text = body.slice(start, end).replace(/\s+/g, ' ').trim();
+    if (text) words.push({ ms: marks[i].ms, text });
+  }
+  WORD_TAG.lastIndex = 0;
+  const text = body.replace(WORD_TAG, '').replace(/\s+/g, ' ').trim();
+  if (!text || !words.length) return null;
+  return { text, words };
 }
 
 /**
