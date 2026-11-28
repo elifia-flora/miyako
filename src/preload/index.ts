@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 const invoke = ipcRenderer.invoke.bind(ipcRenderer);
 
@@ -44,9 +44,29 @@ const api = {
     get: (id: string) => invoke('tracks:get', id),
     upsert: (p: unknown) => invoke('tracks:upsert', p),
     create: (p: unknown) => invoke('tracks:create', p),
+    /**
+     * 拖入音频后登记。mode = versions（多录音版本）/ variants（多音质）/ tracks（每文件一份作品）。
+     * 路径由 pathForFile 从系统拖放的 File 上取，资源管理器、Everything、访达走的是同一条。
+     */
+    importAudio: (input: unknown) => invoke('tracks:import-audio', input),
+    pathForFile: (file: File) => {
+      try {
+        return webUtils.getPathForFile(file);
+      } catch {
+        return '';
+      }
+    },
     rename: (id: string, title: string) => invoke('tracks:rename', id, title),
     update: (id: string, patch: unknown) => invoke('tracks:update', id, patch),
     remove: (id: string) => invoke('tracks:remove', id),
+  },
+  /** 分区拖放：预览不写库；确认时再登记。路径必须是普通字符串，不能把 Vue 的响应式数组直接送过来。 */
+  drop: {
+    preview: (paths: unknown) => invoke('drop:preview', paths),
+    commitLibrary: (input: unknown) => invoke('drop:commit-library', input),
+    commitDetailAudio: (input: unknown) => invoke('drop:commit-detail-audio', input),
+    commitDetailImage: (input: unknown) => invoke('drop:commit-detail-image', input),
+    commitDetailLyric: (input: unknown) => invoke('drop:commit-detail-lyric', input),
   },
   /**
    * 归档：删除曲目只是把它移进 `data/tracks/.archive`，
@@ -117,6 +137,7 @@ const api = {
   art: {
     pick: (trackId: string, kind: string) => invoke('art:pick', trackId, kind),
     clear: (trackId: string, kind: string) => invoke('art:clear', trackId, kind),
+    clearVersion: (trackId: string, recId: string) => invoke('art:clear-version', trackId, recId),
   },
   /** 播放列表：`{ schemaVersion, lists: [{ id, name, trackIds }] }`，源在 data/playlists.json */
   playlists: {
@@ -127,9 +148,10 @@ const api = {
     setTracks: (id: string, trackIds: string[]) => invoke('playlists:set-tracks', id, trackIds),
   },
   lyrics: {
-    resolve: (trackId: string) => invoke('lyrics:resolve', trackId),
+    resolve: (trackId: string, recId?: string | null) => invoke('lyrics:resolve', trackId, recId ?? null),
     pick: (trackId: string) => invoke('lyrics:pick', trackId),
     clear: (trackId: string) => invoke('lyrics:clear', trackId),
+    clearVersion: (trackId: string, recId: string) => invoke('lyrics:clear-version', trackId, recId),
     setInstrumental: (trackId: string, on: boolean) => invoke('lyrics:instrumental', trackId, on),
     /** 改某一句：ms 改时间戳、text 改内容，写回 lrc 文件 */
     saveLine: (trackId: string, patch: unknown) => invoke('lyrics:save-line', trackId, patch),

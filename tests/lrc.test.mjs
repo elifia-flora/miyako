@@ -84,6 +84,35 @@ test('activeLineIndex：返回最后一个已到达的句子', () => {
   assert.equal(activeLineIndex(lines, 2500), 2);
 });
 
+test('增强 LRC：行级文本去掉逐字标记，逐字时间单独留下', () => {
+  const { lines } = parseLrc('[00:12.34]<00:12.34>你<00:13.00>好');
+  assert.equal(lines.length, 1);
+  assert.equal(lines[0].ms, 12340);
+  assert.equal(lines[0].text, '你好');
+  assert.deepEqual(lines[0].words, [
+    { ms: 12340, text: '你' },
+    { ms: 13000, text: '好' },
+  ]);
+});
+
+test('增强 LRC 的 offset 同时推进行级和逐字时间', () => {
+  const { lines } = parseLrc('[offset:500]\n[00:01.000]<00:01.000>A <00:01.200>B');
+  assert.equal(lines[0].ms, 1500);
+  assert.equal(lines[0].text, 'A B');
+  assert.deepEqual(lines[0].words.map((w) => w.ms), [1500, 1700]);
+});
+
+test('activeLineIndex：有结束时间时，空白段不高亮', () => {
+  const lines = [
+    { ms: 0, endMs: 1000, text: 'a' },
+    { ms: 2000, endMs: 3000, text: 'b' },
+  ];
+  assert.equal(activeLineIndex(lines, 500), 0);
+  assert.equal(activeLineIndex(lines, 1000), -1);
+  assert.equal(activeLineIndex(lines, 1500), -1);
+  assert.equal(activeLineIndex(lines, 2500), 1);
+});
+
 test('activeLineIndex：还没到第一句时是 -1，空数组也是 -1', () => {
   assert.equal(activeLineIndex([{ ms: 5000, text: 'x' }], 0), -1);
   assert.equal(activeLineIndex([], 0), -1);

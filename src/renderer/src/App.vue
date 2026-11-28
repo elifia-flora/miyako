@@ -28,6 +28,7 @@ import { TEMPLATE_VARIABLES, templateSegments } from '@shared/titleTemplate.js';
 import { applyVariable, suggestVariables } from '@shared/templateSuggest.js';
 import { LOCALES } from '@shared/i18n.js';
 import { PERIODS, periodLabel } from '@shared/search.js';
+import { classifyDroppedPaths, dropNotice } from '@shared/audiodrop.js';
 import { insertText, pickMode } from '@shared/suggest.js';
 import { meterInfo, meterSystemForLocale } from '@shared/meter.js';
 import { timelineDurationMs } from '@shared/timeline-clock.js';
@@ -992,16 +993,25 @@ function onEdgeUp(ev: PointerEvent) {
  * 变量值允许再嵌一层 `{ key, vars }`（比如「唤起失败：<原因>」里的原因），
  * 渲染时才一起翻 —— 否则就会出现「Could not open: 客户端未安装」这种半句英文半句中文。
  */
-const message = ref<{ key: string; vars?: Record<string, unknown> } | null>(null);
+const message = ref<
+  | { key: string; vars?: Record<string, unknown>; parts?: undefined }
+  | { parts: { key: string; vars?: Record<string, unknown> }[]; key?: undefined }
+  | null
+>(null);
+function renderNotice(key: string, vars?: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(vars ?? {})) {
+    const nested = v as { key?: string; vars?: Record<string, unknown> } | null;
+    out[k] = nested && typeof nested === 'object' && typeof nested.key === 'string' ? t(nested.key, nested.vars) : v;
+  }
+  return t(key, out);
+}
 const messageText = computed(() => {
   const m = message.value;
   if (!m) return '';
-  const vars: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(m.vars ?? {})) {
-    const nested = v as { key?: string; vars?: Record<string, unknown> } | null;
-    vars[k] = nested && typeof nested === 'object' && typeof nested.key === 'string' ? t(nested.key, nested.vars) : v;
-  }
-  return t(m.key, vars);
+  if (m.parts?.length) return m.parts.map((p) => renderNotice(p.key, p.vars)).filter(Boolean).join(' · ');
+  if (!m.key) return '';
+  return renderNotice(m.key, m.vars);
 });
 
 /** 主进程回来的原因：优先用可重翻的键，没有键就用原文 */
@@ -1134,7 +1144,23 @@ const activeRecording = computed<any>(() => {
 // 必须在 activeRecording 声明**之后**注册：watch 注册时就会跑一次 getter 收集依赖，
 // 放在前面会撞 TDZ（`Cannot access 'activeRecording' before initialization`），
 // 而且这个错误发生在 smoke 的 console-message 监听装好之前，冒烟看不见。
-watch([() => detail.value?.id, () => activeRecording.value?.id], () => void loadAudioMeta());
+async function loadLyricsForActive() {
+  const id = detail.value?.id;
+  if (!id) {
+    lyricDoc.value = { found: false, file: null, lines: [], instrumental: false, how: 'none', format: 'none', editable: false, recId: null };
+    return;
+  }
+  const recId = activeRecording.value?.id ?? null;
+  try {
+    lyricDoc.value = await api.lyrics.resolve(id, recId);
+  } catch {
+    lyricDoc.value = { found: false, file: null, lines: [], instrumental: false, how: 'none', format: 'none', editable: false, recId: null };
+  }
+}
+watch([() => detail.value?.id, () => activeRecording.value?.id], () => {
+  void loadAudioMeta();
+  void loadLyricsForActive();
+});
 
 /**
  * 原点偏移是**逐版本**的。
@@ -1954,6 +1980,11 @@ function onGlobalKey(ev: KeyboardEvent) {
    * 模板编辑器有未保存文本时 `closePrefs` 会先弹确认框；
    * 那个框自己吃掉 Esc（`onConfirmKey`），所以这里的 Esc 不会再传下去。
    */
+  if (ev.key === 'Escape' && dropDialog.value && !dropBusy.value) {
+    ev.preventDefault();
+    cancelDropChoose();
+    return;
+  }
   if (ev.key === 'Escape' && showPrefs.value && !confirmBox.value) {
     ev.preventDefault();
     void closePrefs();
@@ -2322,6 +2353,277 @@ async function registerWork() {
   editCaretEnd.value = false;
   editPrefix.value = null;
   message.value = { key: 'msg.registered' };
+}
+
+/* ---------------- 分区拖放 ----------------
+ *
+ * 资源管理器、Everything、访达丢进来的都是系统文件拖放（dataTransfer.files）。
+ * 列表区登记新作品；详情区绑到当前作品。整窗都拦住默认打开文件。
+ * 送去主进程的路径一律先拷成普通字符串：Vue 的响应式数组过不了 IPC。
+ */
+const dropHot = ref<null | 'library' | 'detail'>(null);
+const dropBusy = ref(false);
+const dropDialog = ref<null | any>(null);
+
+function plainList(list: unknown): string[] {
+  return Array.isArray(list) ? list.map((p) => String(p ?? '')).filter(Boolean) : [];
+}
+
+function dragHasFiles(ev: DragEvent) {
+  const types = ev.dataTransfer?.types;
+  if (!types) return false;
+  return [...types].includes('Files');
+}
+
+function pathsFromDrop(ev: DragEvent) {
+  const files = [...(ev.dataTransfer?.files ?? [])];
+  const paths: string[] = [];
+  let missed = 0;
+  for (const file of files) {
+    const p = String(api.tracks.pathForFile?.(file) ?? '');
+    if (p) paths.push(p);
+    else missed++;
+  }
+  return { paths, missed };
+}
+
+function zoneOf(ev: DragEvent): 'library' | 'detail' | null {
+  const el = ev.target as Element | null;
+  if (!el?.closest) return null;
+  if (el.closest('[data-drop-zone="detail"]')) return detail.value ? 'detail' : null;
+  if (el.closest('[data-drop-zone="library"]')) return 'library';
+  return null;
+}
+
+function onDropDragOver(ev: DragEvent) {
+  if (!dragHasFiles(ev)) return;
+  ev.preventDefault();
+  if (dropBusy.value || dropDialog.value) return;
+  if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'copy';
+  const zone = zoneOf(ev);
+  // 分割条和两块之间的缝不是投放区。这里若把 dropHot 清掉，
+  // 两块玻璃会卸掉再盖上，拖过去就闪一下。只有真正进入某一边才改高亮。
+  if (zone) dropHot.value = zone;
+}
+
+function onDropDragLeave(ev: DragEvent) {
+  if (ev.type === 'dragend') {
+    dropHot.value = null;
+    return;
+  }
+  // 系统拖文件穿过子元素时，relatedTarget 经常是空的，人其实还在窗口里。
+  // 只在指针离开窗口时收起，避免两块区域之间来回闪。
+  const next = ev.relatedTarget as Node | null;
+  if (next && document.documentElement.contains(next)) return;
+  const x = ev.clientX;
+  const y = ev.clientY;
+  const inside = x > 0 && y > 0 && x < window.innerWidth && y < window.innerHeight;
+  if (!inside) dropHot.value = null;
+}
+
+function cancelDropChoose() {
+  dropDialog.value = null;
+}
+
+function applyDropResult(res: any, missed = 0, extraRejected = 0) {
+  const parts = dropNotice({
+    ...res,
+    failed: (Number(res?.failed) || 0) + missed,
+    rejected: (Number(res?.rejected) || 0) + extraRejected,
+  });
+  message.value = { parts };
+}
+
+async function finishDrop(res: any, missed = 0, extraRejected = 0) {
+  applyDropResult(res, missed, extraRejected);
+  const id = res?.tracks?.[0]?.id;
+  if (!id) return;
+  const recId = res?.versionIds?.[0]?.recId ? String(res.versionIds[0].recId) : null;
+  if (res?.attached) {
+    if (recId) await loadTrack(id, recId);
+    await refreshDetail();
+  } else {
+    activeList.value = ALL_PLAYLIST;
+    await loadRows();
+    await select(id);
+    if (recId) await loadTrack(id, recId);
+  }
+  await loadLyricsForActive();
+}
+
+async function commitLibrary(
+  mode: 'versions' | 'variants' | 'tracks',
+  audio: string[],
+  image: string[],
+  lyric: string[],
+  bind: 'bundle' | 'album' | 'none',
+  policy: string,
+  missed: number,
+  extraRejected: number
+) {
+  dropDialog.value = null;
+  dropBusy.value = true;
+  dropHot.value = null;
+  try {
+    const res = await api.drop.commitLibrary({
+      paths: plainList(audio),
+      imagePaths: plainList(image),
+      lyricPaths: plainList(lyric),
+      mode,
+      bind,
+      policy,
+      untitled: t('track.untitled'),
+    });
+    await finishDrop(res, missed, extraRejected);
+  } catch (err: any) {
+    message.value = { key: 'drop.failed', vars: { note: String(err?.message ?? err) } };
+  } finally {
+    dropBusy.value = false;
+  }
+}
+
+async function openDropDialog(zone: 'library' | 'detail', paths: string[], missed: number) {
+  dropBusy.value = true;
+  dropHot.value = null;
+  try {
+    const preview = await api.drop.preview(plainList(paths));
+    const versions = (detail.value?.recordings ?? []).map((r: any) => ({
+      id: String(r.id),
+      label: recName(r),
+    }));
+    const activeId = activeRecording.value?.id ? String(activeRecording.value.id) : versions[0]?.id ?? '';
+    const kind = zone === 'detail'
+      ? (preview.audio?.length ? 'detail-audio' : preview.images?.length ? 'detail-image' : 'detail-lyric')
+      : 'library-audio';
+    dropDialog.value = {
+      zone,
+      kind,
+      missed,
+      preview,
+      versions,
+      audioMode: 'versions',
+      detailAudioMode: 'versions',
+      parentId: activeId,
+      coverKind: 'single',
+      lyricScope: activeId ? 'version' : 'work',
+      targetRecId: activeId,
+      conductor: '',
+      orchestra: '',
+      year: '',
+      policy: 'rename',
+      trackId: detail.value?.id ? String(detail.value.id) : '',
+    };
+  } catch (err: any) {
+    message.value = { key: 'drop.failed', vars: { note: String(err?.message ?? err) } };
+  } finally {
+    dropBusy.value = false;
+  }
+}
+
+function onDropFiles(ev: DragEvent) {
+  if (!dragHasFiles(ev)) return;
+  ev.preventDefault();
+  // 以松开时指针下面的那一块为准。拖过缝时 dropHot 还留着上一边，不能拿它当落点。
+  const zone = zoneOf(ev);
+  dropHot.value = null;
+  if (dropBusy.value || dropDialog.value) return;
+  const { paths, missed } = pathsFromDrop(ev);
+  if (!zone) {
+    message.value = { key: 'drop.zoneMiss' };
+    return;
+  }
+  const split = classifyDroppedPaths(paths);
+  const kinds = [split.audio.length, split.image.length, split.lyric.length].filter((n) => n > 0).length;
+  if (!split.audio.length && !split.image.length && !split.lyric.length) {
+    message.value = { parts: dropNotice({ rejected: split.rejected.length, failed: missed }) };
+    return;
+  }
+  if (zone === 'library') {
+    if (!split.audio.length) {
+      message.value = { key: 'drop.needDetail' };
+      return;
+    }
+    const sidecars = split.image.length + split.lyric.length;
+    if (split.audio.length === 1 && !sidecars) {
+      void commitLibrary(
+        'tracks',
+        split.audio,
+        split.image,
+        split.lyric,
+        sidecars ? 'bundle' : 'none',
+        'rename',
+        missed,
+        split.rejected.length
+      );
+      return;
+    }
+    void openDropDialog('library', paths, missed);
+    return;
+  }
+  if (kinds > 1) {
+    message.value = { key: 'drop.oneKind' };
+    return;
+  }
+  void openDropDialog('detail', paths, missed);
+}
+
+async function confirmDrop() {
+  const d = dropDialog.value;
+  if (!d) return;
+  const preview = d.preview ?? {};
+  const audio = plainList((preview.audio ?? []).map((a: any) => a.path));
+  const images = plainList((preview.images ?? []).map((a: any) => a.path));
+  const lyrics = plainList((preview.lyrics ?? []).map((a: any) => a.path));
+  const missed = Number(d.missed) || 0;
+  const rejected = (preview.rejected ?? []).length;
+  const policy = String(d.policy || 'rename');
+  if (d.kind === 'library-audio') {
+    const mode = d.audioMode === 'variants' || d.audioMode === 'tracks' ? d.audioMode : 'versions';
+    await commitLibrary(mode, audio, images, lyrics, mode === 'tracks' ? 'album' : 'bundle', policy, missed, rejected);
+    return;
+  }
+  if (d.kind === 'detail-audio' && d.detailAudioMode === 'variants' && !d.parentId) {
+    message.value = { key: 'drop.noVersion' };
+    return;
+  }
+  dropDialog.value = null;
+  dropBusy.value = true;
+  try {
+    let res: any;
+    if (d.kind === 'detail-audio') {
+      const mode = d.detailAudioMode === 'variants' ? 'variants' : 'versions';
+      res = await api.drop.commitDetailAudio({
+        trackId: String(d.trackId),
+        paths: audio,
+        mode,
+        parentId: String(d.parentId || ''),
+        conductor: String(d.conductor || ''),
+        orchestra: String(d.orchestra || ''),
+        recordedYear: String(d.year || '').trim() ? Number(d.year) : null,
+      });
+    } else if (d.kind === 'detail-image') {
+      res = await api.drop.commitDetailImage({
+        trackId: String(d.trackId),
+        paths: images,
+        kind: d.coverKind === 'album' || d.coverKind === 'version' ? d.coverKind : 'single',
+        recId: String(d.targetRecId || ''),
+        policy,
+      });
+    } else {
+      res = await api.drop.commitDetailLyric({
+        trackId: String(d.trackId),
+        paths: lyrics,
+        scope: d.lyricScope === 'work' ? 'work' : 'version',
+        recId: String(d.targetRecId || ''),
+        policy,
+      });
+    }
+    await finishDrop(res, missed, rejected);
+  } catch (err: any) {
+    message.value = { key: 'drop.failed', vars: { note: String(err?.message ?? err) } };
+  } finally {
+    dropBusy.value = false;
+  }
 }
 
 async function renameRow(payload: { id: string; title: string }) {
@@ -2852,8 +3154,7 @@ async function select(id: string) {
   selectedId.value = id;
   detail.value = await api.tracks.get(id);
   if (detail.value?.analysis?.viewId) viewId.value = detail.value.analysis.viewId;
-  // 歌词状态（详情面板里显示匹配情况）
-  try { lyricDoc.value = await api.lyrics.resolve(id); } catch { lyricDoc.value = { found: false, file: null, lines: [], instrumental: false, how: 'none' }; }
+  // 歌词跟当前演奏版本走，由上面的 watch 拉。这里不再单独解析，免得和版本切换各算一遍。
   // 音频跟着选中项走：不 await，播放条自己会显示载入中。
   // 但要把 promise 留一手：双击播放要求「src 已经挂上」才真的出声。
   //
@@ -3240,17 +3541,50 @@ async function onRecManagerChanged(payload?: { files?: boolean }) {
   if (wasPlaying) playAudio();
 }
 
-/* 封面：只给一个绿色文件名，点开才看图 —— 详情面板窄，缩略图会喧宾夺主 */
-const coverName = computed(() => {
-  const c = detail.value?.covers;
-  if (!c?.url) return '';
+/* 封面：当前演奏版本 → 作品独立封面 → 专辑封面。面板上仍只显示文件名。 */
+const shownCover = computed(() => {
+  const d = detail.value;
+  if (!d) return null;
+  const rec = activeRecording.value;
+  if (rec?.coverRel) {
+    const name = String(rec.coverRel).split(/[\\/]/).pop() || t('detail.cover');
+    return {
+      source: 'version' as const,
+      name,
+      url: `ma-art://cover/${encodeURIComponent(d.id)}/version/${encodeURIComponent(rec.id)}?v=${encodeURIComponent(rec.coverRel)}`,
+    };
+  }
+  const c = d.covers;
+  if (!c?.url) return null;
   const src: string = c.source === 'album' ? c.album : c.single;
-  const base = String(src ?? '').split(/[\\/]/).pop() ?? '';
-  return base || t('detail.cover');
+  return {
+    source: (c.source === 'album' ? 'album' : 'single') as 'album' | 'single',
+    name: String(src ?? '').split(/[\\/]/).pop() || t('detail.cover'),
+    url: c.url as string,
+  };
 });
 function viewCover() {
-  const url = detail.value?.covers?.url;
+  const url = shownCover.value?.url;
   if (url) void api.win.openImage?.(url, detailTitleText.value);
+}
+async function clearShownCover() {
+  const c = shownCover.value;
+  const id = detail.value?.id;
+  if (!c || !id) return;
+  if (c.source === 'version') await api.art.clearVersion(id, activeRecording.value?.id);
+  else await api.art.clear(id, c.source);
+  await refreshDetail();
+}
+async function clearShownLyrics() {
+  const id = detail.value?.id;
+  if (!id) return;
+  if (lyricDoc.value?.how === 'version' && activeRecording.value?.id) {
+    await api.lyrics.clearVersion(id, activeRecording.value.id);
+  } else {
+    await api.lyrics.clear(id);
+  }
+  await refreshDetail();
+  await loadLyricsForActive();
 }
 
 /* ---- 详情面板的就地编辑（双击值 → 输入框 → Enter/失焦保存） ----
@@ -4101,6 +4435,10 @@ watch(panelH, (v) => {
 });
 
 onMounted(async () => {
+  window.addEventListener('dragover', onDropDragOver, true);
+  window.addEventListener('dragleave', onDropDragLeave, true);
+  window.addEventListener('drop', onDropFiles, true);
+  window.addEventListener('dragend', onDropDragLeave, true);
   applyTplFont();
   /**
    * 界面缩放要**第一个**落位。
@@ -4464,6 +4802,10 @@ watch([panelOpen, panelH, leftW, rightW, gridUnit, viewId, themeMode], () => tou
 watch(() => detail.value?.analysis?.id ?? null, () => void syncHistMenu());
 
 onBeforeUnmount(() => {
+  window.removeEventListener('dragover', onDropDragOver, true);
+  window.removeEventListener('dragleave', onDropDragLeave, true);
+  window.removeEventListener('drop', onDropFiles, true);
+  window.removeEventListener('dragend', onDropDragLeave, true);
   document.removeEventListener('pointerover', onHelpPointerOver);
   document.removeEventListener('pointerout', onHelpPointerOut);
   window.removeEventListener('keydown', onGlobalKey);
@@ -4742,7 +5084,11 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
-        <div class="table-pane">
+        <div class="table-pane" data-drop-zone="library">
+          <div v-if="dropHot" class="drop-glass" :class="{ hot: dropHot === 'library' }">
+            <strong>{{ t('drop.zoneLibrary') }}</strong>
+            <span>{{ t('drop.zoneLibraryHint') }}</span>
+          </div>
           <LibraryView
             data-help-region="library"
             :rows="listRows"
@@ -4855,7 +5201,11 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- 详情：模块清单是固定的，但每首曲目可以右键决定显示哪几块 -->
-      <aside class="detail" v-if="detail" data-help-region="detail" @contextmenu.prevent="onDetailContextMenu">
+      <aside class="detail" v-if="detail" data-help-region="detail" data-drop-zone="detail" @contextmenu.prevent="onDetailContextMenu">
+        <div v-if="dropHot" class="drop-glass" :class="{ hot: dropHot === 'detail' }">
+          <strong>{{ t('drop.zoneDetail') }}</strong>
+          <span>{{ t('drop.zoneDetailHint') }}</span>
+        </div>
         <div class="d-head">
           <h2>
             <input
@@ -5642,11 +5992,12 @@ onBeforeUnmount(() => {
 
           <!-- 封面：跟在音频下面。只显示绿色文件名（省地方、不抢戏），点开才看图 -->
           <div class="d-covers">
-            <template v-if="detail.covers?.url">
+            <template v-if="shownCover">
               <button class="cover-file" :title="t('detail.coverView')" @click="viewCover">
-                {{ coverName }}
+                {{ shownCover.name }}
               </button>
-              <button class="chip tiny" :title="t('detail.coverClear')" @click="api.art.clear(detail.id, detail.covers.source)">{{ t('detail.coverClear') }}</button>
+              <span v-if="shownCover.source === 'version'" class="faint tiny">{{ t('lyrics.sourceVersion') }}</span>
+              <button class="chip tiny" :title="t('detail.coverClear')" @click="clearShownCover">{{ t('detail.coverClear') }}</button>
             </template>
             <template v-else>
               <button class="cover-add" :title="t('detail.coverPick')" @click="api.art.pick(detail.id, 'single')">+ {{ t('detail.coverSingle') }}</button>
@@ -5661,10 +6012,11 @@ onBeforeUnmount(() => {
               <span class="inst-tag">{{ t('detail.instrumental') }}</span>
               <button class="chip tiny" @click="api.lyrics.setInstrumental(detail.id, false)">{{ t('lyrics.unmarkInstrumental') }}</button>
             </template>
-            <template v-else-if="detail.lyricsFile || lyricDoc.found">
-              <span class="lyric-how">{{ detail.lyricsFile ? t('lyrics.manual') : t('lyrics.autoMatched') }}</span>
-              <span class="faint tiny">{{ detail.lyricsFile ?? lyricDoc.file }}</span>
-              <button class="chip tiny" @click="api.lyrics.clear(detail.id)">{{ t('lyrics.clear') }}</button>
+            <template v-else-if="lyricDoc.found || lyricDoc.how === 'version' || lyricDoc.how === 'manual'">
+              <span class="lyric-how">{{ lyricDoc.how === 'version' ? t('lyrics.sourceVersion') : lyricDoc.how === 'auto' ? t('lyrics.autoMatched') : t('lyrics.manual') }}</span>
+              <span v-if="lyricDoc.format === 'elrc' || lyricDoc.format === 'srt'" class="faint tiny">{{ lyricDoc.format === 'srt' ? t('lyrics.formatSrt') : t('lyrics.formatElrc') }}</span>
+              <span class="faint tiny">{{ lyricDoc.file }}</span>
+              <button v-if="lyricDoc.how === 'version' || lyricDoc.how === 'manual'" class="chip tiny" @click="clearShownLyrics">{{ t('lyrics.clear') }}</button>
             </template>
             <template v-else>
               <span class="faint tiny">{{ t('detail.lyricsNone') }}</span>
@@ -5848,6 +6200,125 @@ onBeforeUnmount(() => {
         <div class="ws-actions">
           <button class="chip" @click="newListForPick()">{{ t('plPick.newAndAdd') }}</button>
           <button class="chip" @click="plPick = null">{{ t('btn.cancel') }}</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="dropBusy" class="drop-overlay busy" role="status">
+      <div class="drop-card">{{ t('drop.loading') }}</div>
+    </div>
+    <div v-if="dropDialog" class="modal-mask above" @click.self="cancelDropChoose">
+      <div class="modal confirm drop-dialog" role="dialog" aria-modal="true">
+        <h3>{{ dropDialog.kind === 'library-audio' ? t('drop.chooseTitle') : dropDialog.kind === 'detail-audio' ? t('drop.detailAudioTitle') : dropDialog.kind === 'detail-image' ? t('drop.imageTitle') : t('drop.lyricTitle') }}</h3>
+        <div class="drop-scroll">
+        <div class="drop-files">
+          <p class="tiny dim">{{ t('drop.files') }}</p>
+          <div v-for="a in dropDialog.preview.audio" :key="a.path" class="drop-file">
+            <b>{{ a.title || a.name }}</b>
+            <span>{{ a.format || '—' }} · {{ a.sampleRate ? (a.sampleRate / 1000).toFixed(1) + ' kHz' : '—' }} · {{ a.channels || '—' }}ch</span>
+            <span v-if="a.dupTitle" class="warn">{{ t('drop.dup', { title: a.dupTitle }) }}</span>
+          </div>
+          <div v-for="img in dropDialog.preview.images" :key="img.path" class="drop-file">
+            <img v-if="img.thumb" class="drop-thumb" :src="img.thumb" alt="" />
+            <b>{{ img.name }}</b>
+          </div>
+          <div v-for="ly in dropDialog.preview.lyrics" :key="ly.path" class="drop-file">
+            <b>{{ ly.name }}</b>
+            <span v-for="(line, i) in ly.preview" :key="i" class="dim">{{ line }}</span>
+          </div>
+        </div>
+        <div v-if="dropDialog.kind === 'library-audio'" class="drop-choices">
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.audioMode === 'versions' }" @click="dropDialog.audioMode = 'versions'">
+            <b>{{ t('drop.modeVersions') }}</b>
+            <span>{{ t('drop.modeVersionsNote') }}</span>
+          </button>
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.audioMode === 'variants' }" @click="dropDialog.audioMode = 'variants'">
+            <b>{{ t('drop.modeVariants') }}</b>
+            <span>{{ t('drop.modeVariantsNote') }}</span>
+          </button>
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.audioMode === 'tracks' }" @click="dropDialog.audioMode = 'tracks'">
+            <b>{{ t('drop.modeTracks') }}</b>
+            <span>{{ t('drop.modeTracksNote') }}</span>
+          </button>
+          <p v-if="dropDialog.preview.images.length || dropDialog.preview.lyrics.length" class="tiny dim">
+            {{ dropDialog.audioMode === 'tracks' ? t('drop.albumNote') : t('drop.bundleNote') }}
+          </p>
+        </div>
+        <div v-else-if="dropDialog.kind === 'detail-audio'" class="drop-choices">
+          <div class="drop-option">
+            <button type="button" class="drop-choice" :class="{ on: dropDialog.detailAudioMode === 'versions' }" @click="dropDialog.detailAudioMode = 'versions'">
+              <b>{{ t('drop.detailNewVersions') }}</b>
+              <span>{{ t('drop.detailNewVersionsNote') }}</span>
+            </button>
+            <div v-if="dropDialog.detailAudioMode === 'versions'" class="drop-sub">
+              <label class="drop-field">{{ t('drop.fieldConductor') }}
+                <input v-model="dropDialog.conductor" />
+              </label>
+              <label class="drop-field">{{ t('drop.fieldOrchestra') }}
+                <input v-model="dropDialog.orchestra" />
+              </label>
+              <label class="drop-field">{{ t('drop.fieldYear') }}
+                <input v-model="dropDialog.year" inputmode="numeric" />
+              </label>
+            </div>
+          </div>
+          <div class="drop-option">
+            <button type="button" class="drop-choice" :class="{ on: dropDialog.detailAudioMode === 'variants' }" :disabled="!dropDialog.versions.length" @click="dropDialog.detailAudioMode = 'variants'">
+              <b>{{ t('drop.detailVariants') }}</b>
+              <span>{{ dropDialog.versions.length ? t('drop.detailVariantsNote') : t('drop.noVersion') }}</span>
+            </button>
+            <label v-if="dropDialog.detailAudioMode === 'variants'" class="drop-sub">
+              <span class="drop-field">{{ t('drop.detailVariants') }}
+                <select v-model="dropDialog.parentId">
+                  <option v-for="v in dropDialog.versions" :key="v.id" :value="v.id">{{ v.label }}</option>
+                </select>
+              </span>
+            </label>
+          </div>
+        </div>
+        <div v-else-if="dropDialog.kind === 'detail-image'" class="drop-choices">
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.coverKind === 'single' }" @click="dropDialog.coverKind = 'single'">
+            <b>{{ t('drop.imageSingle') }}</b>
+          </button>
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.coverKind === 'album' }" @click="dropDialog.coverKind = 'album'">
+            <b>{{ t('drop.imageAlbum') }}</b>
+          </button>
+          <div class="drop-option">
+            <button type="button" class="drop-choice" :class="{ on: dropDialog.coverKind === 'version' }" @click="dropDialog.coverKind = 'version'">
+              <b>{{ t('drop.imageVersion') }}</b>
+            </button>
+            <label v-if="dropDialog.coverKind === 'version'" class="drop-sub">
+              <select v-model="dropDialog.targetRecId">
+                <option v-for="v in dropDialog.versions" :key="v.id" :value="v.id">{{ v.label }}</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div v-else class="drop-choices">
+          <div class="drop-option">
+            <button type="button" class="drop-choice" :class="{ on: dropDialog.lyricScope === 'version' }" @click="dropDialog.lyricScope = 'version'">
+              <b>{{ t('drop.lyricVersion') }}</b>
+            </button>
+            <label v-if="dropDialog.lyricScope === 'version'" class="drop-sub">
+              <select v-model="dropDialog.targetRecId">
+                <option v-for="v in dropDialog.versions" :key="v.id" :value="v.id">{{ v.label }}</option>
+              </select>
+            </label>
+          </div>
+          <button type="button" class="drop-choice" :class="{ on: dropDialog.lyricScope === 'work' }" @click="dropDialog.lyricScope = 'work'">
+            <b>{{ t('drop.lyricWork') }}</b>
+          </button>
+        </div>
+        <div v-if="dropDialog.kind !== 'detail-audio' && (dropDialog.preview.images.length || dropDialog.preview.lyrics.length)" class="drop-policy">
+          <p class="tiny dim">{{ t('drop.policy') }}</p>
+          <label class="drop-radio"><input type="radio" value="rename" v-model="dropDialog.policy" /> <span>{{ t('drop.policyRename') }}</span></label>
+          <label class="drop-radio"><input type="radio" value="skip" v-model="dropDialog.policy" /> <span>{{ t('drop.policySkip') }}</span></label>
+          <label class="drop-radio"><input type="radio" value="overwrite" v-model="dropDialog.policy" /> <span>{{ t('drop.policyOverwrite') }}</span></label>
+        </div>
+        </div>
+        <div class="confirm-actions drop-actions">
+          <button class="chip" @click="confirmDrop">{{ t('drop.confirm') }}</button>
+          <button class="chip" @click="cancelDropChoose">{{ t('drop.cancel') }}</button>
         </div>
       </div>
     </div>
@@ -7033,7 +7504,7 @@ body.resizing .vsplit::after { opacity: 0.9; }
   display: flex; flex-direction: column;
   background: var(--bg);
 }
-.table-pane { flex: 1; min-height: 0; overflow: hidden; }
+.table-pane { flex: 1; min-height: 0; overflow: hidden; position: relative; }
 
 /*
  * 下方面板：**上下分栏里的下半截**，不是浮层。
@@ -7082,6 +7553,7 @@ body.resizing .vsplit::after { opacity: 0.9; }
   overflow: auto;
   background: var(--surface);
   padding-bottom: 20px;
+  position: relative;
 }
 .d-head { padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
 .d-head h2 {
@@ -7839,4 +8311,176 @@ html[lang='en'] .k::after { content: ': '; }
   box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.35);
 }
 
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg) 46%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+.drop-overlay.busy { pointer-events: auto; }
+.drop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  text-align: center;
+}
+.drop-card span { color: var(--text-dim); font-size: 12px; }
+/* 整块盖住可拖区域。没被指针碰到的更接近背景色。
+   碰到的一边：深色取「浅青绿」和「沉绿」的中间，浅色取「较实的薄荷」和 #e8f6ef 的中间。
+   只要指针在其中一边上，两边都写出松开后会怎样。 */
+.drop-glass {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 28%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+}
+:root[data-theme="light"] .drop-glass.hot {
+  background: color-mix(in srgb, var(--accent-2) 23%, transparent);
+}
+:root[data-theme="dark"] .drop-glass.hot {
+  background: color-mix(in srgb, color-mix(in srgb, var(--accent-2) 31%, var(--sel-fill)) 56%, transparent);
+}
+.drop-glass strong,
+.drop-glass span { max-width: min(340px, 100%); }
+.drop-glass strong { font-size: 15px; font-weight: 500; color: var(--text); }
+.drop-glass span { font-size: 12px; line-height: 1.5; color: var(--text-dim); }
+.drop-dialog {
+  width: min(460px, calc(100vw - 48px));
+  max-width: 460px;
+  max-height: min(78vh, 720px);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px 14px;
+  overflow: hidden;
+}
+.drop-dialog h3 { margin-bottom: 12px; }
+.drop-scroll {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  /* 文件列表、选项、重名策略是三件不同的事，间距大于组内 */
+  gap: 22px;
+  padding-right: 2px;
+}
+.drop-actions {
+  flex: none;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.drop-choices { display: flex; flex-direction: column; gap: 14px; }
+.drop-option { display: flex; flex-direction: column; gap: 8px; }
+/* 挂在某个选项下面的输入：缩进并贴着那一块，和另一个选项隔开 */
+.drop-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 50%, var(--line));
+}
+.drop-sub > select { width: 100%; height: 28px; }
+.drop-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: left;
+  white-space: normal;
+  line-height: 1.45;
+}
+.drop-choice b { font-size: 12.5px; font-weight: 500; }
+.drop-choice span { color: var(--text-dim); font-size: 11px; font-weight: 400; }
+.drop-choice:hover { border-color: var(--line-strong); }
+.drop-choice.on {
+  border-color: var(--accent);
+  background: var(--sel-bg);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.drop-choice:disabled { opacity: 0.45; cursor: default; }
+.drop-files { display: flex; flex-direction: column; gap: 10px; }
+.drop-files > p { margin: 0 0 -2px; }
+.drop-file { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font-size: 12px; }
+.drop-file b + span { margin-top: -2px; }
+.drop-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; }
+.drop-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.drop-field select,
+.drop-field input:not([type="radio"]) { width: 100%; height: 28px; }
+.drop-policy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding-top: 0;
+}
+.drop-policy > p { margin: 0 0 2px; }
+.drop-radio {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.3;
+}
+.drop-radio input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  background: transparent;
+  display: grid;
+  place-content: center;
+}
+.drop-radio input[type="radio"]::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+}
+.drop-radio input[type="radio"]:checked {
+  border-color: var(--accent);
+}
+.drop-radio input[type="radio"]:checked::after { background: var(--accent); }
+.drop-radio input[type="radio"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.35);
+}
 </style>

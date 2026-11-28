@@ -9,6 +9,7 @@
  * 样式来自主进程 IPC 广播（跨窗口 localStorage 不可靠）。
  */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { activeLineIndex } from '@shared/lrc.js';
 import { t } from './i18n';
 
 const api = (window as any).api;
@@ -21,10 +22,11 @@ const player = ref({
   currentMs: 0,
   durationMs: 0,
   ready: false,
+  recId: null as string | null,
 });
 
 /* ---- 歌词 ---- */
-interface LyricLine { ms: number; text: string }
+interface LyricLine { ms: number; endMs?: number; text: string }
 const lines = ref<LyricLine[]>([]);
 const instrumental = ref(false);
 
@@ -33,16 +35,7 @@ const style = ref({ size: 34, opacity: 0.95, color: 'white' as 'white' | 'accent
 
 /* ---- 当前句索引 ---- */
 function activeIndex(): number {
-  const ms = player.value.currentMs;
-  const arr = lines.value;
-  if (!arr.length) return -1;
-  let lo = 0, hi = arr.length - 1;
-  while (lo < hi) {
-    const mid = (lo + hi + 1) >> 1;
-    if (arr[mid].ms <= ms) lo = mid;
-    else hi = mid - 1;
-  }
-  return arr[lo].ms <= ms ? lo : -1;
+  return activeLineIndex(lines.value, player.value.currentMs);
 }
 
 const curLine = computed(() => {
@@ -66,12 +59,14 @@ const colorMap: Record<string, { fg: string; shadow?: string }> = {
 const colors = computed(() => colorMap[style.value.color] ?? colorMap.white);
 
 /* ---- 加载歌词 ---- */
-async function loadForTrack(trackId: string) {
-  if (!trackId) { lines.value = []; return; }
+let loadedKey = '';
+async function loadForTrack(trackId: string, recId?: string | null) {
+  if (!trackId) { lines.value = []; loadedKey = ''; return; }
   try {
-    const doc = await api.lyrics.resolve(trackId);
+    const doc = await api.lyrics.resolve(trackId, recId ?? null);
     lines.value = doc.lines ?? [];
     instrumental.value = !!doc.instrumental;
+    loadedKey = `${trackId}|${recId || ''}`;
   } catch {
     lines.value = [];
   }
@@ -110,14 +105,22 @@ let unsubStyle: (() => void) | null = null;
 
 onMounted(async () => {
   unsubState = api.player.onState((st: any) => {
-    player.value = { ...st };
-    if (st.trackId) void loadForTrack(st.trackId);
+    player.value = { ...player.value, ...st };
+    const key = `${st.trackId || ''}|${st.recId || ''}`;
+    if (key !== loadedKey) void loadForTrack(st.trackId, st.recId ?? null);
   });
   // 读当前样式
   try { style.value = await api.lyrics.style(); } catch { /* 用默认 */ }
   unsubStyle = api.lyrics.onStyle((st: any) => {
     if (st) style.value = { ...st };
   });
+  try {
+    const st = await api.player.state();
+    if (st?.trackId) {
+      player.value = { ...player.value, ...st };
+      void loadForTrack(st.trackId, st.recId ?? null);
+    }
+  } catch { /* 窗口刚开，主窗口可能还没播 */ }
 });
 
 onBeforeUnmount(() => {

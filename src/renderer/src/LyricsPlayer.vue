@@ -14,7 +14,7 @@
  *  3) 控制指令一律发给主窗口 —— 音频宿主只有它一个，这里绝不放第二个 <audio>。
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { formatLrcStamp, parseLrcStamp } from '@shared/lrc.js';
+import { activeLineIndex, formatLrcStamp, parseLrcStamp } from '@shared/lrc.js';
 import { t } from './i18n';
 
 const api = (window as any).api;
@@ -32,13 +32,16 @@ const player = ref({
   currentMs: 0,
   durationMs: 0,
   ready: false,
+  recId: null as string | null,
 });
 
 /* ---- 歌词 ---- */
-interface LyricLine { ms: number; text: string }
+interface LyricLine { ms: number; endMs?: number; text: string }
 const lyrics = ref<LyricLine[]>([]);
 const lyricMeta = ref<any>(null);
-const lyricHow = ref<'manual' | 'auto' | 'none' | 'instrumental'>('none');
+const lyricHow = ref<'manual' | 'auto' | 'none' | 'instrumental' | 'version'>('none');
+const lyricEditable = ref(true);
+const lyricFormat = ref<'lrc' | 'elrc' | 'srt' | 'none'>('none');
 const instrumental = ref(false);
 /** 时间戳默认开着：听众要照着唱/对照，没这个没法用 */
 const showTimestamps = ref(localStorage.getItem('ma-lyrics-ts') !== '0');
@@ -77,17 +80,11 @@ function currentTime(): number {
  * 算出来存进 ref，而不是在模板里当函数调 —— 模板每帧重渲染都调一次的话，
  * N 行歌词就是每帧 N 次二分查找，白烧 CPU。
  */
-const activeIdx = computed(() => {
-  const ms = currentTime();
-  const lines = lyrics.value;
-  if (!lines.length) return -1;
-  let lo = 0, hi = lines.length - 1;
-  while (lo < hi) {
-    const mid = (lo + hi + 1) >> 1;
-    if (lines[mid].ms <= ms) lo = mid;
-    else hi = mid - 1;
-  }
-  return lines[lo].ms <= ms ? lo : -1;
+const activeIdx = computed(() => activeLineIndex(lyrics.value, currentTime()));
+const editTitle = computed(() => {
+  if (lyricFormat.value === 'elrc' || lyricFormat.value === 'srt') return t('lyrics.readonlyTimed');
+  if (!lyricEditable.value) return t('lyrics.readonly');
+  return t('lyrics.editText');
 });
 
 /** 翻译按 ms 对齐原句；差 50ms 内算同一句，对不上就退回按行序 */
@@ -112,7 +109,8 @@ function scrollToActive() {
 
 /* ---- 加载歌词与详情 ---- */
 let loadToken = 0;
-async function loadForTrack(trackId: string) {
+let loadedKey = '';
+async function loadForTrack(trackId: string, recId?: string | null) {
   if (!trackId) {
     lyrics.value = [];
     lyricMeta.value = null;
@@ -120,6 +118,8 @@ async function loadForTrack(trackId: string) {
     coverBroken.value = false;
     detail.value = null;
     lyricHow.value = 'none';
+    lyricEditable.value = false;
+    lyricFormat.value = 'none';
     instrumental.value = false;
     translation.value = [];
     translationFile.value = null;
@@ -129,7 +129,7 @@ async function loadForTrack(trackId: string) {
   const my = ++loadToken;
   try {
     const [doc, det, trans] = await Promise.all([
-      api.lyrics.resolve(trackId),
+      api.lyrics.resolve(trackId, recId ?? null),
       api.tracks.get(trackId),
       // 翻译可能没有，不是错误
       api.lyrics.translation(trackId).catch(() => ({ found: false, file: null, lines: [] })),
@@ -139,8 +139,14 @@ async function loadForTrack(trackId: string) {
     lyricMeta.value = doc.meta ?? null;
     instrumental.value = !!doc.instrumental;
     lyricHow.value = doc.instrumental ? 'instrumental' : doc.how;
-    // 优先独立封面，没有才退到专辑封面（coversOf 已经按这个优先级给出 url）
-    coverUrl.value = det?.covers?.url ?? null;
+    lyricEditable.value = !!doc.editable;
+    lyricFormat.value = doc.format ?? 'lrc';
+    loadedKey = `${trackId}|${recId || ''}`;
+    const rec = recId ? (det?.recordings ?? []).find((r: any) => r.id === recId) : det?.currentRecording;
+    const versionCover = rec?.coverRel
+      ? `ma-art://cover/${encodeURIComponent(trackId)}/version/${encodeURIComponent(rec.id)}?v=${encodeURIComponent(rec.coverRel)}`
+      : null;
+    coverUrl.value = versionCover ?? det?.covers?.url ?? null;
     coverBroken.value = false;
     detail.value = det ?? null;
     translation.value = trans?.lines ?? [];
@@ -229,6 +235,10 @@ function flash(msg: string) {
 function startEdit(idx: number, kind: EditKind) {
   const line = lyrics.value[idx];
   if (!line) return;
+  if (lyricFormat.value === 'elrc' || lyricFormat.value === 'srt' || !lyricEditable.value) {
+    flash(lyricFormat.value === 'elrc' || lyricFormat.value === 'srt' ? t('lyrics.readonlyTimed') : t('lyrics.readonly'));
+    return;
+  }
   editing.value = { idx, kind, draft: kind === 'ms' ? formatLrcStamp(line.ms) : line.text };
   // 等 input 真的渲染出来再聚焦（nextTick 是 Vue 的 DOM 更新完成信号）
   void nextTick(() => {
@@ -263,7 +273,7 @@ async function commitEdit() {
   }
 
   try {
-    const res = await api.lyrics.saveLine(player.value.trackId, patch);
+    const res = await api.lyrics.saveLine(player.value.trackId, { ...patch, recId: player.value.recId });
     if (res?.code === 'readonly') {
       flash(t('lyrics.readonly'));
       return;
@@ -282,22 +292,16 @@ async function commitEdit() {
 async function pickLyrics() {
   if (!player.value.trackId) return;
   const doc = await api.lyrics.pick(player.value.trackId);
-  if (doc) {
-    lyrics.value = doc.lines ?? [];
-    lyricMeta.value = doc.meta;
-    lyricHow.value = 'manual';
-    instrumental.value = false;
-    scrollToIdx = -1;
-  }
+  if (doc) await loadForTrack(player.value.trackId, player.value.recId);
 }
 async function clearLyrics() {
   if (!player.value.trackId) return;
-  const doc = await api.lyrics.clear(player.value.trackId);
-  if (doc) {
-    lyrics.value = doc.lines ?? [];
-    lyricHow.value = doc.how;
-    instrumental.value = !!doc.instrumental;
+  if (lyricHow.value === 'version' && player.value.recId) {
+    await api.lyrics.clearVersion(player.value.trackId, player.value.recId);
+  } else {
+    await api.lyrics.clear(player.value.trackId);
   }
+  await loadForTrack(player.value.trackId, player.value.recId);
 }
 async function toggleInstrumental() {
   if (!player.value.trackId) return;
@@ -380,9 +384,9 @@ onMounted(() => {
     if (typeof st?.gain === 'number' && Date.now() > gainEchoUntil) {
       gainPct.value = Math.round(st.gain * 100);
     }
-    if (st.trackId && (!detail.value || detail.value.id !== st.trackId)) {
-      void loadForTrack(st.trackId);
-    }
+    const key = `${st.trackId || ''}|${st.recId || ''}`;
+    if (st.trackId && key !== loadedKey) void loadForTrack(st.trackId, st.recId ?? null);
+    if (!st.trackId) loadedKey = '';
   });
 
   /**
@@ -400,7 +404,7 @@ onMounted(() => {
     if (st) {
       player.value = { ...st };
       if (typeof st.gain === 'number') gainPct.value = Math.round(st.gain * 100);
-      if (st.trackId) void loadForTrack(st.trackId);
+      if (st.trackId) void loadForTrack(st.trackId, st.recId ?? null);
     }
   });
 
@@ -556,6 +560,7 @@ const creditRows = computed(() => {
           <span v-if="saveHint" class="lp-hint">{{ saveHint }}</span>
           <span v-else-if="lyricHow === 'auto'" class="tiny faint">{{ t('lyrics.autoMatched') }}</span>
           <span v-else-if="lyricHow === 'manual'" class="tiny faint">{{ t('lyrics.manual') }}</span>
+          <span v-else-if="lyricHow === 'version'" class="tiny faint">{{ t('lyrics.sourceVersion') }}</span>
           <span v-else-if="lyricHow === 'instrumental'" class="tiny faint">{{ t('lyrics.instrumental') }}</span>
         </div>
 
@@ -594,7 +599,7 @@ const creditRows = computed(() => {
               <span
                 v-if="showTimestamps"
                 class="l-ts"
-                :title="t('lyrics.editTime')"
+                :title="editTitle"
                 @dblclick.stop="startEdit(i, 'ms')"
               >
                 <input
@@ -611,7 +616,7 @@ const creditRows = computed(() => {
                 <template v-else>{{ formatLrcStamp(line.ms) }}</template>
               </span>
               <!-- 歌词正文：双击可改 -->
-              <span class="l-text" :title="t('lyrics.editText')" @dblclick.stop="startEdit(i, 'text')">
+              <span class="l-text" :title="editTitle" @dblclick.stop="startEdit(i, 'text')">
                 <input
                   v-if="editing?.idx === i && editing.kind === 'text'"
                   :ref="setEditInput"
@@ -706,7 +711,7 @@ const creditRows = computed(() => {
           <span class="tick" />{{ t('lyrics.pick') }}
         </button>
         <button
-          v-if="hasLyrics || lyricHow === 'manual'"
+          v-if="hasLyrics || lyricHow === 'manual' || lyricHow === 'version'"
           class="lp-menu-item"
           @click="clearLyrics(); closeMenu()"
         >

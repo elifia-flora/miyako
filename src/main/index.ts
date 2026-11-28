@@ -43,6 +43,14 @@ import * as searchIpc from './ipc/search';
 import * as neteaseIpc from './ipc/netease';
 import * as mediaIpc from './ipc/media';
 import * as recordingIpc from './ipc/recording';
+import {
+  commitDetailAudio,
+  commitDetailImages,
+  commitDetailLyrics,
+  commitLibraryDrop,
+  importDroppedAudio,
+  previewDrop,
+} from './ipc/dropaudio';
 import * as playlistsIpc from './ipc/playlists';
 import { currentLocale, mt, onLocaleChange, setCurrentLocale } from './locale';
 import { matchHotkey, needsSurface } from '../shared/hotkeys.js';
@@ -168,6 +176,7 @@ let playerState: PlayerState = {
   durationMs: 0,
   ready: false,
   gain: 1,
+  recId: null,
 };
 
 /** 操作历史（撤销/重做）的唯一真相，等 data 目录确定后再构造 */
@@ -1388,6 +1397,21 @@ function registerIpc() {
     syncTrackJson(r.id);
     return r;
   });
+  // 拖入音频：登记作品 + 录音版本。JSON 镜像仍走这里，和手工登记同一条出口
+  ipcMain.handle('tracks:import-audio', async (_e, input) => {
+    const r = await importDroppedAudio(ctx(), input ?? {});
+    for (const t of r.tracks) syncTrackJson(t.id);
+    return r;
+  });
+  const syncDrop = (r: { tracks?: { id: string }[] }) => {
+    for (const t of r?.tracks ?? []) if (t?.id) syncTrackJson(t.id);
+    return r;
+  };
+  ipcMain.handle('drop:preview', async (_e, paths) => previewDrop(ctx(), paths));
+  ipcMain.handle('drop:commit-library', async (_e, input) => syncDrop(await commitLibraryDrop(ctx(), input ?? {})));
+  ipcMain.handle('drop:commit-detail-audio', async (_e, input) => syncDrop(await commitDetailAudio(ctx(), input ?? {})));
+  ipcMain.handle('drop:commit-detail-image', async (_e, input) => syncDrop(await commitDetailImages(ctx(), input ?? {})));
+  ipcMain.handle('drop:commit-detail-lyric', async (_e, input) => syncDrop(await commitDetailLyrics(ctx(), input ?? {})));
   ipcMain.handle('tracks:rename', (_e, id, title) => {
     const r = tracks.renameTrack(ctx(), id, title);
     if (r) syncTrackJson(r.id);
@@ -1570,7 +1594,12 @@ function registerIpc() {
     syncTrackJson(trackId);
     return r;
   });
-  ipcMain.handle('lyrics:resolve', (_e, trackId) => mediaIpc.resolveLyrics(ctx(), trackId));
+  ipcMain.handle('art:clear-version', (_e, trackId, recId) => {
+    const r = mediaIpc.clearVersionCover(ctx(), trackId, String(recId ?? ''));
+    syncTrackJson(trackId);
+    return r;
+  });
+  ipcMain.handle('lyrics:resolve', (_e, trackId, recId) => mediaIpc.resolveLyrics(ctx(), trackId, recId ?? null));
   ipcMain.handle('lyrics:pick', (_e, trackId) => {
     const r = mediaIpc.pickLyrics(ctx(), trackId);
     syncTrackJson(trackId);
@@ -1578,6 +1607,11 @@ function registerIpc() {
   });
   ipcMain.handle('lyrics:clear', (_e, trackId) => {
     const r = mediaIpc.clearLyrics(ctx(), trackId);
+    syncTrackJson(trackId);
+    return r;
+  });
+  ipcMain.handle('lyrics:clear-version', (_e, trackId, recId) => {
+    const r = mediaIpc.clearVersionLyrics(ctx(), trackId, String(recId ?? ''));
     syncTrackJson(trackId);
     return r;
   });
@@ -1682,6 +1716,7 @@ function registerIpc() {
       ready: !!st?.ready,
       // 0 是合法的（静音），不能写成 `|| 1`；缺字段时才退回 1
       gain: typeof st?.gain === 'number' ? Math.max(0, Math.min(1, st.gain)) : 1,
+      recId: st?.recId ? String(st.recId) : null,
     };
     const titleChanged = next.title !== playerState.title;
     playerState = next;

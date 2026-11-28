@@ -22,8 +22,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { dialog } from 'electron';
 import { parseLrc, serializeLrc } from '../../shared/lrc.js';
+import { parseSrt } from '../../shared/srt.js';
+import { decodeLyricBytes } from '../../shared/lyrictext.js';
 import { mt } from '../locale';
 import { writeFileAtomic } from '../atomic-write.js';
+import { hashFile } from './filehash';
+import { setVersionMedia, versionMaster } from './recording';
 
 export type CoverKind = 'single' | 'album';
 export const COVER_KINDS: CoverKind[] = ['single', 'album'];
@@ -211,12 +215,20 @@ export function serveArt(ctx: MediaCtx, req: Request): Response {
   const url = new URL(req.url);
   const parts = url.pathname.split('/').filter(Boolean);
   const trackId = decodeURIComponent(parts[0] ?? '');
-  const kind = (parts[1] ?? '') as CoverKind;
-  if (!trackId || !COVER_KINDS.includes(kind))
-    return new Response('bad cover url', { status: 400, headers: CORS });
+  const kind = parts[1] ?? '';
+  if (!trackId) return new Response('bad cover url', { status: 400, headers: CORS });
 
-  const covers = coversOf(ctx, trackId);
-  const rel = kind === 'single' ? covers.single : covers.album;
+  let rel: string | null = null;
+  if (kind === 'single' || kind === 'album') {
+    const covers = coversOf(ctx, trackId);
+    rel = kind === 'single' ? covers.single : covers.album;
+  } else if (kind === 'version') {
+    const recId = decodeURIComponent(parts[2] ?? '');
+    const master = recId ? versionMaster({ db: ctx.db }, recId) : null;
+    rel = master && master.trackId === trackId ? master.coverRel : null;
+  } else {
+    return new Response('bad cover url', { status: 400, headers: CORS });
+  }
   const file = absOf(ctx.dataDir, rel);
   if (!file || !fs.existsSync(file)) return new Response('cover not found', { status: 404, headers: CORS });
 
@@ -246,8 +258,13 @@ export function serveArt(ctx: MediaCtx, req: Request): Response {
 
 export interface LyricLine {
   ms: number;
+  endMs?: number;
   text: string;
+  words?: { ms: number; text: string }[];
 }
+
+export type LyricFormat = 'lrc' | 'elrc' | 'srt' | 'none';
+export type MediaPolicy = 'overwrite' | 'skip' | 'rename';
 
 export interface LyricDoc {
   trackId: string;
@@ -260,8 +277,11 @@ export interface LyricDoc {
   meta: { ti: string; ar: string; al: string; by: string; offset: number; credits: string[] };
   /** 曲目被标记成纯音乐（没有歌词是正常状态，不该显示「未匹配」） */
   instrumental: boolean;
-  /** 和曲名对得上的程度：auto = 自动匹配，manual = 用户指定 */
-  how: 'manual' | 'auto' | 'none';
+  /** version = 演奏版本自己的文件；manual = 作品级；auto = 按曲名对上的 .lrc */
+  how: 'version' | 'manual' | 'auto' | 'none';
+  format: LyricFormat;
+  editable: boolean;
+  recId: string | null;
 }
 
 const EMPTY_META = { ti: '', ar: '', al: '', by: '', offset: 0, credits: [] as string[] };
@@ -318,21 +338,59 @@ function autoFind(ctx: MediaCtx, trackId: string, title: string): string | null 
   return best?.file ?? null;
 }
 
-function parseFile(file: string): { lines: LyricLine[]; meta: LyricDoc['meta'] } {
+function lyricFormatOf(file: string, lines: LyricLine[]): LyricFormat {
+  if (path.extname(file).toLowerCase() === '.srt') return 'srt';
+  if (lines.some((l) => Array.isArray(l.words) && l.words.length > 0)) return 'elrc';
+  return lines.length ? 'lrc' : 'none';
+}
+
+function parseFile(file: string): { lines: LyricLine[]; meta: LyricDoc['meta']; format: LyricFormat } {
+  const empty = { lines: [] as LyricLine[], meta: { ...EMPTY_META }, format: 'none' as LyricFormat };
   try {
     const buf = fs.readFileSync(file);
     // 歌词是文本，超过 4MB 基本是选错文件了
-    if (buf.length > 4 * 1024 * 1024) return { lines: [], meta: { ...EMPTY_META } };
-    // 不猜 GBK：现代 lrc 都是 UTF-8；真遇到乱码用户会换文件
-    const text = buf.toString('utf8');
+    if (buf.length > 4 * 1024 * 1024) return empty;
+    const text = decodeLyricBytes(buf);
+    if (path.extname(file).toLowerCase() === '.srt') {
+      const { lines } = parseSrt(text);
+      return { lines, meta: { ...EMPTY_META }, format: lines.length ? 'srt' : 'none' };
+    }
     const { lines, meta } = parseLrc(text);
-    return { lines, meta };
+    return { lines, meta, format: lyricFormatOf(file, lines) };
   } catch {
-    return { lines: [], meta: { ...EMPTY_META } };
+    return empty;
   }
 }
 
-export function resolveLyrics(ctx: MediaCtx, trackId: string): LyricDoc {
+function docFromFile(
+  trackId: string,
+  file: string,
+  how: LyricDoc['how'],
+  instrumental: boolean,
+  recId: string | null
+): LyricDoc {
+  const { lines, meta, format } = parseFile(file);
+  return {
+    trackId,
+    found: lines.length > 0,
+    file: path.basename(file),
+    path: file,
+    lines,
+    meta,
+    instrumental,
+    how,
+    format: lines.length ? format : 'none',
+    // 逐字和字幕写回会丢掉原始时间戳；自动匹配到的素材文件本来就不能改
+    editable: format === 'lrc' && how !== 'auto',
+    recId,
+  };
+}
+
+/**
+ * 读取顺序：当前演奏版本自己的歌词 → 作品级歌词 → 按曲名自动对上的 .lrc。
+ * recId 可以是音质行，会先走到它的父版本。
+ */
+export function resolveLyrics(ctx: MediaCtx, trackId: string, recId?: string | null): LyricDoc {
   const row = trackRow(ctx.db, trackId);
   const empty: LyricDoc = {
     trackId,
@@ -343,38 +401,29 @@ export function resolveLyrics(ctx: MediaCtx, trackId: string): LyricDoc {
     meta: { ...EMPTY_META },
     instrumental: false,
     how: 'none',
+    format: 'none',
+    editable: false,
+    recId: null,
   };
   if (!row) return empty;
 
   const extra = readExtra(row.extra);
   const instrumental = extra.instrumental === true;
-  const manual = extra.lyrics ? absOf(ctx.dataDir, String(extra.lyrics)) : null;
-
-  let file: string | null = null;
-  let how: LyricDoc['how'] = 'none';
-  if (manual && fs.existsSync(manual)) {
-    file = manual;
-    how = 'manual';
-  } else {
-    const hit = autoFind(ctx, trackId, row.title);
-    if (hit) {
-      file = hit;
-      how = 'auto';
-    }
+  const wanted = recId ? versionMaster({ db: ctx.db }, String(recId)) : null;
+  const versionRel = wanted && wanted.trackId === trackId ? wanted.lyricsRel : null;
+  const versionFile = versionRel ? absOf(ctx.dataDir, versionRel) : null;
+  if (versionFile && fs.existsSync(versionFile)) {
+    return docFromFile(trackId, versionFile, 'version', instrumental, wanted!.id);
   }
 
-  if (!file) return { ...empty, instrumental, how: 'none' };
-  const { lines, meta } = parseFile(file);
-  return {
-    trackId,
-    found: lines.length > 0,
-    file: path.basename(file),
-    path: file,
-    lines,
-    meta,
-    instrumental,
-    how,
-  };
+  const manual = extra.lyrics ? absOf(ctx.dataDir, String(extra.lyrics)) : null;
+  if (manual && fs.existsSync(manual)) {
+    return docFromFile(trackId, manual, 'manual', instrumental, null);
+  }
+
+  const hit = autoFind(ctx, trackId, row.title);
+  if (hit) return docFromFile(trackId, hit, 'auto', instrumental, null);
+  return { ...empty, instrumental, how: 'none' };
 }
 
 /** 选一个 .lrc：复制进 data/lyrics，路径记进 extra */
@@ -446,11 +495,14 @@ export function setInstrumental(ctx: MediaCtx, trackId: string, on: boolean): Ly
 export function saveLyricLine(
   ctx: MediaCtx,
   trackId: string,
-  patch: { index: number; ms?: number; text?: string }
+  patch: { index: number; ms?: number; text?: string; recId?: string | null }
 ): LyricDoc | { code: 'readonly' | 'badindex' | 'nodoc' } {
-  const doc = resolveLyrics(ctx, trackId);
+  const doc = resolveLyrics(ctx, trackId, patch?.recId ?? null);
   if (!doc.found || !doc.path) return { code: 'nodoc' };
-  if (doc.how === 'auto') return { code: 'readonly' };
+  // 增强 LRC / SRT 这一轮不写回。serializeLrc 只认识行级时间戳，写回去逐字和结束时间都没了。
+  if (!doc.editable || doc.how === 'auto' || doc.format === 'elrc' || doc.format === 'srt') {
+    return { code: 'readonly' };
+  }
 
   const idx = Number(patch?.index);
   if (!Number.isInteger(idx) || idx < 0 || idx >= doc.lines.length) return { code: 'badindex' };
@@ -471,7 +523,7 @@ export function saveLyricLine(
     console.error('[lyrics] 写回失败', doc.path, e);
     return { code: 'nodoc' };
   }
-  return resolveLyrics(ctx, trackId);
+  return resolveLyrics(ctx, trackId, patch?.recId ?? null);
 }
 
 /**
@@ -561,4 +613,140 @@ export function clearLyricsTranslation(ctx: MediaCtx, trackId: string): boolean 
     .run(JSON.stringify(extra), Date.now(), trackId);
   if (old) removeMediaFile(ctx.dataDir, old);
   return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* 拖入时复制封面 / 歌词。同名且内容不同才问覆盖、跳过或另存。          */
+/* ------------------------------------------------------------------ */
+
+export interface PlaceResult {
+  rel: string | null;
+  action: 'copied' | 'overwritten' | 'skipped' | 'renamed';
+}
+
+function posixRel(sub: string, name: string): string {
+  return path.posix.join(sub, name);
+}
+
+/** 把外部文件复制进 data/<sub>/。内容相同则复用已有文件，不再写一遍。 */
+export async function placeMediaFile(
+  dataDir: string,
+  sub: string,
+  src: string,
+  base: string,
+  policy: MediaPolicy
+): Promise<PlaceResult> {
+  const dir = path.join(dataDir, sub);
+  fs.mkdirSync(dir, { recursive: true });
+  const ext = path.extname(src).toLowerCase() || '.bin';
+  const stem = safeName(base) || 'file';
+  const firstName = `${stem}${ext}`;
+  const first = path.join(dir, firstName);
+  if (path.resolve(src) === path.resolve(first)) return { rel: posixRel(sub, firstName), action: 'copied' };
+  if (!fs.existsSync(first)) {
+    fs.copyFileSync(src, first);
+    return { rel: posixRel(sub, firstName), action: 'copied' };
+  }
+  const srcHash = await hashFile(src);
+  const dstHash = await hashFile(first);
+  if (srcHash === dstHash) return { rel: posixRel(sub, firstName), action: 'copied' };
+  if (policy === 'skip') return { rel: null, action: 'skipped' };
+  if (policy === 'overwrite') {
+    fs.copyFileSync(src, first);
+    return { rel: posixRel(sub, firstName), action: 'overwritten' };
+  }
+  for (let i = 2; i < 100; i++) {
+    const name = `${stem}-${i}${ext}`;
+    const dst = path.join(dir, name);
+    if (!fs.existsSync(dst)) {
+      fs.copyFileSync(src, dst);
+      return { rel: posixRel(sub, name), action: 'renamed' };
+    }
+    if ((await hashFile(dst)) === srcHash) return { rel: posixRel(sub, name), action: 'copied' };
+  }
+  return { rel: null, action: 'skipped' };
+}
+
+export type CoverTarget = CoverKind | 'version';
+
+export async function bindCoverFile(
+  ctx: MediaCtx,
+  trackId: string,
+  src: string,
+  kind: CoverTarget,
+  recId: string | null,
+  policy: MediaPolicy
+): Promise<{ ok: boolean; action: string; rel: string | null }> {
+  const row = trackRow(ctx.db, trackId);
+  if (!row) return { ok: false, action: 'missing', rel: null };
+  const base = kind === 'version' ? `${row.title}-version` : `${row.title}-${kind}`;
+  const placed = await placeMediaFile(ctx.dataDir, 'covers', src, base, policy);
+  if (!placed.rel) return { ok: false, action: placed.action, rel: null };
+  if (kind === 'version') {
+    if (!recId) return { ok: false, action: 'norec', rel: null };
+    const master = versionMaster({ db: ctx.db }, recId);
+    if (!master || master.trackId !== trackId) return { ok: false, action: 'norec', rel: null };
+    setVersionMedia({ db: ctx.db }, recId, { coverRel: placed.rel });
+    if (master.coverRel && master.coverRel !== placed.rel) removeMediaFile(ctx.dataDir, master.coverRel);
+    return { ok: true, action: placed.action, rel: placed.rel };
+  }
+  const cur = coversOf(ctx, trackId);
+  const old = kind === 'single' ? cur.single : cur.album;
+  writeCovers(ctx, trackId, { [kind]: placed.rel });
+  if (old && old !== placed.rel) removeMediaFile(ctx.dataDir, old);
+  return { ok: true, action: placed.action, rel: placed.rel };
+}
+
+export async function bindLyricFile(
+  ctx: MediaCtx,
+  trackId: string,
+  src: string,
+  scope: 'work' | 'version',
+  recId: string | null,
+  policy: MediaPolicy
+): Promise<{ ok: boolean; action: string; rel: string | null }> {
+  const row = trackRow(ctx.db, trackId);
+  if (!row) return { ok: false, action: 'missing', rel: null };
+  const base = scope === 'version' ? `${row.title}-version` : row.title;
+  const placed = await placeMediaFile(ctx.dataDir, 'lyrics', src, base, policy);
+  if (!placed.rel) return { ok: false, action: placed.action, rel: null };
+  if (scope === 'version') {
+    if (!recId) return { ok: false, action: 'norec', rel: null };
+    const master = versionMaster({ db: ctx.db }, recId);
+    if (!master || master.trackId !== trackId) return { ok: false, action: 'norec', rel: null };
+    setVersionMedia({ db: ctx.db }, recId, { lyricsRel: placed.rel });
+    if (master.lyricsRel && master.lyricsRel !== placed.rel) removeMediaFile(ctx.dataDir, master.lyricsRel);
+    const extra = readExtra(row.extra);
+    if (extra.instrumental) {
+      delete extra.instrumental;
+      ctx.db.prepare(`UPDATE track SET extra = ?, updated_at = ? WHERE id = ?`).run(JSON.stringify(extra), Date.now(), trackId);
+    }
+    return { ok: true, action: placed.action, rel: placed.rel };
+  }
+  const extra = readExtra(row.extra);
+  const old = extra.lyrics as string | undefined;
+  extra.lyrics = placed.rel;
+  delete extra.instrumental;
+  ctx.db.prepare(`UPDATE track SET extra = ?, updated_at = ? WHERE id = ?`).run(JSON.stringify(extra), Date.now(), trackId);
+  if (old && old !== placed.rel) removeMediaFile(ctx.dataDir, old);
+  return { ok: true, action: placed.action, rel: placed.rel };
+}
+
+export function clearVersionCover(ctx: MediaCtx, trackId: string, recId: string): CoverSet | null {
+  const master = versionMaster({ db: ctx.db }, recId);
+  if (!master || master.trackId !== trackId) return coversOf(ctx, trackId);
+  setVersionMedia({ db: ctx.db }, master.id, { coverRel: null });
+  if (master.coverRel) removeMediaFile(ctx.dataDir, master.coverRel);
+  return coversOf(ctx, trackId);
+}
+
+export function clearVersionLyrics(ctx: MediaCtx, trackId: string, recId: string): LyricDoc | null {
+  const row = trackRow(ctx.db, trackId);
+  if (!row) return null;
+  const master = versionMaster({ db: ctx.db }, recId);
+  if (master && master.trackId === trackId) {
+    setVersionMedia({ db: ctx.db }, master.id, { lyricsRel: null });
+    if (master.lyricsRel) removeMediaFile(ctx.dataDir, master.lyricsRel);
+  }
+  return resolveLyrics(ctx, trackId, recId);
 }
