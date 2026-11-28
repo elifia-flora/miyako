@@ -89,3 +89,4 @@ NVIDIA Corporation/
 
 # 打包产物（electron-builder）：安装包几十 MB，不进仓库；发布走 GitHub Release
 dist/
+/docs/PACKAGING.md

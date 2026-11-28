@@ -44,6 +44,7 @@ export const JA = {
   'menu.search': '検索',
   'menu.search.focus': '検索ボックスへ移動',
   'menu.search.clear': '検索をクリア',
+  'menu.search.notes': 'タイムラインのメモを含める',
   'menu.ws': 'ワークスペース',
   'menu.ws.save': '現在のレイアウトを保存…',
   'menu.ws.saveNote':
@@ -129,7 +130,11 @@ export const JA = {
 
   /* ---------------- 検索行 ---------------- */
   'search.placeholder': '曲名 / 作曲者 / 調性 / 時代 / ジャンル / 情緒 / タグで検索（複数の語はスペースで区切る）',
+  'search.placeholderNotes':
+    '曲名 / 作曲者 / 調性 / 時代 / ジャンル / 情緒 / タグ / タイムラインのメモで検索（複数の語はスペースで区切る）',
   'search.hint': '中国語の時代名と旋法はライブラリ内の正規値に変換してから照合します。長い欧文語は全文索引を使います',
+  'search.hintNotes':
+    '中国語の時代名と旋法はライブラリ内の正規値に変換してから照合します。長い欧文語は全文索引を使います。タイムラインのメモ行に書いた文字も対象です。',
   'search.clear': 'クリア',
   'search.clearTitle': '検索条件をクリア（Ctrl+Shift+F）',
 
@@ -544,9 +549,14 @@ export const JA = {
   'prefs.templateVarKind': '変数',
 
   'prefs.tabLook': '外観',
+  'prefs.tabSearch': '検索',
   'prefs.tabEdit': '編集',
   'prefs.tabPlay': '再生',
   'prefs.tabWin': 'ウィンドウ',
+  'prefs.search': '検索範囲',
+  'prefs.searchNote':
+    '初期状態では、タイムラインのメモ行に書いた文字も曲ライブラリの検索に入ります（ボイシング案の配置メモを含み、楽章のメモは親作品に付きます）。メニュー「検索」のチェックと同じスイッチです。外すとメモは検索対象から外れます。',
+  'prefs.searchNotes': 'タイムラインのメモを検索',
   'prefs.numeral': '転回番号の書き方',
   'prefs.numeralHan': '漢数字（第一転回）',
   'prefs.numeralArabic': 'アラビア数字（第1転回）',

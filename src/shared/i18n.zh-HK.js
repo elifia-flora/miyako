@@ -5,7 +5,7 @@
  * `i18n.zh-TW.js`（台灣）+ `i18n.zh-HK.patch.js`（香港差异表）合成。
  * 改文案去改台湾那份；只有港式用词不同才往差异表里加一条。
  *
- * 生成出来是**完整**的 1170 条，不是「覆盖层」：
+ * 生成出来是**完整**的 1177 条，不是「覆盖层」：
  * 运行时不做缺键回落，就不会出现港台混排。
  */
 export const ZH_HK = {
@@ -41,6 +41,7 @@ export const ZH_HK = {
   'menu.search': '搜尋',
   'menu.search.focus': '聚焦搜尋框',
   'menu.search.clear': '清除搜尋',
+  'menu.search.notes': '包含時間線備註',
   'menu.ws': '工作區',
   'menu.ws.save': '儲存目前布局為…',
   'menu.ws.saveNote': '記住視窗位置與大小、面板、左右欄寬度、縮放、主題、泳道方案，以及三個子視窗的開合與位置。',
@@ -117,7 +118,9 @@ export const ZH_HK = {
   'chordTable.source': '源檔案',
   'chordTable.discard': '有未儲存的改動，確定關閉？',
   'search.placeholder': '搜尋曲名 / 作曲 / 調性 / 時期 / 流派 / 情緒 / 標籤（多個關鍵詞用空格分隔）',
+  'search.placeholderNotes': '搜尋曲名 / 作曲 / 調性 / 時期 / 流派 / 情緒 / 標籤 / 時間線備註（多個關鍵詞用空格分隔）',
   'search.hint': '中文時期與調式會翻成庫裏的規範值再匹配；西文長詞走全文索引',
+  'search.hintNotes': '中文時期與調式會翻成庫裏的規範值再匹配；西文長詞走全文索引。時間線「備註」列裏的文字也算。',
   'search.clear': '清除',
   'search.clearTitle': '清除搜尋條件（Ctrl+Shift+F）',
   'table.title': '曲名',
@@ -501,9 +504,13 @@ export const ZH_HK = {
   'prefs.templatePresetKind': '預設',
   'prefs.templateVarKind': '變數',
   'prefs.tabLook': '外觀',
+  'prefs.tabSearch': '搜尋',
   'prefs.tabEdit': '編輯',
   'prefs.tabPlay': '播放',
   'prefs.tabWin': '視窗',
+  'prefs.search': '搜尋範圍',
+  'prefs.searchNote': '預設會把時間線面板「備註」列裏寫的字算進曲庫搜尋（排列方案的「排列備註」也算；樂章上的備註算到母作品）。和選單「搜尋」裏的勾選是同一個開關。取消後，備註不再參與搜尋。',
+  'prefs.searchNotes': '搜尋時間線備註',
   'prefs.numeral': '轉位數字寫法',
   'prefs.numeralHan': '漢字（第一轉位）',
   'prefs.numeralArabic': '阿拉伯（第1轉位）',

@@ -42,6 +42,14 @@
     "sections": [],
     "keys": []
   },
-  "events": [],
+  "events": [
+    {
+      "lane": "note",
+      "tick": 3840,
+      "durTicks": 1920,
+      "text": "我很喜欢这个",
+      "confidence": "confirmed"
+    }
+  ],
   "extra": {}
 }
